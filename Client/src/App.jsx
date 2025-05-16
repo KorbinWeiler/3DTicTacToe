@@ -29,8 +29,8 @@ function App() {
     //x: x, y: y, z: 0
 
     if(update != ""){
-      const x = Number(update[1]);
-      const y = Number(update[0]);
+      const x = Number(update[0]);
+      const y = Number(update[1]);
       const z = Number(update[2]);
       let win = false;
       console.log("Current Space " + x,y,z)
@@ -40,8 +40,8 @@ function App() {
       win = win || test.checkWin('X',3, 0, z , -1, 1, 0); //down to the left same z
       win = win || test.checkWin('X',3, 0, z , -1, 1, 1); //down to the left all z
 
-      //test.checkWin(0, 3, z);
-      //test.checkWin(3, 3, z);
+      test.checkWin(0, 3, z);
+      test.checkWin(3, 3, z);
 
       win = win || test.checkWin('X',x, 0, z, 0, 1, 0);
       win = win || test.checkWin('X',x, 0, z, 0, 1, 1);

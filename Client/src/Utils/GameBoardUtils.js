@@ -25,8 +25,8 @@ class GameBoardUtils{
     checkWin(playerValue, x, y, z, xScale, yScale, zScale){
 
         let count = 0;
-        console.log(x.toString() + y.toString()+ z.toString() + playerValue)
         while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
+            console.log(x.toString() + y.toString()+ z.toString() + playerValue)
             const tile = this.getTile(x, y, z);
             console.log(tile.val + " " + playerValue)
             if(tile.val === playerValue){
