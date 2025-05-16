@@ -9,8 +9,37 @@ class GameBoardUtils{
     }
 
     getTile(x,y,z){
-
         return this.boards[z].board[x][y]
+    }
+
+    //Corners
+    //x: 0, y: 0, z: z
+    //x: 3, y: 0, z: z
+    //x: 0, y: 3, z: z
+    //x: 3, y: 3, z: z
+
+    //Down, Left, and Right
+    //x: x, y: 0, z: z
+    //x: 0, y: y, z: z
+    //x: x, y: y, z: 0
+    checkWin(playerValue, x, y, z, xScale, yScale, zScale){
+
+        let count = 0;
+        console.log(x.toString() + y.toString()+ z.toString() + playerValue)
+        while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
+            const tile = this.getTile(x, y, z);
+            console.log(tile.val + " " + playerValue)
+            if(tile.val === playerValue){
+                count++;
+            }
+
+            x += 1 * xScale;
+            y += 1 * yScale;
+            z += 1 * zScale;
+        }
+        console.log(count)
+        return count === 4;
+
     }
 }
 

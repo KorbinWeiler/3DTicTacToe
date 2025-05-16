@@ -1,40 +1,35 @@
 import "../App.css"
 import { useState, useEffect, useContext } from "react"
-import { UpdateContext } from "./GameBoard";
+import { UpdateContext } from "../App";
+import { playerContext } from "./GameBoard";
 
 export default function GameButton({x, y, z, Tile}){
     const [style, setStyle] = useState("light");
     const [text, setText] = useState("")
 
-    const {updates, playerValues} = useContext(UpdateContext)
+    const {updates} = useContext(UpdateContext)
+    const {players} = useContext(playerContext)
     const [update, forceUpdate] = updates;
-    const [player, setPlayer] = playerValues
+    const [player, setPlayer] = players
 
     const stylePresets = "default m-1 w-10 h-10"
 
-    function changeColor(){
-        player ? setStyle("light") : setStyle("dark");
-        player ? setText("X") : setText("O");
-        setPlayer(!player);
-        console.log(x + " " + y + " " + z);
-        console.log(Tile);
-        Tile.val = 'Y';
-        console.log(Tile.val);
-    }
-
     function updateTile(){
-        if(Tile.val === ""){
+        if(Tile.val === " " || style === "default"){
             player ? setStyle("light") : setStyle("dark");
             player ? Tile.val = "X" : Tile.val="O";
             setPlayer(!player);
-            forceUpdate(Date.now)
-        }
-        
-    }
+            const tileName = x.toString() + y.toString() + z.toString()
 
+            forceUpdate(x.toString() + y.toString() + z.toString())
+            //forceUpdate(Date.now)
+        }       
+    }
+    /*
     useEffect(()=>{
-        
+        console.log("hit")
     }, [update])
+    */
 
     return (
         <>
