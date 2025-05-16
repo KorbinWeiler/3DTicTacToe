@@ -33,21 +33,20 @@ function App() {
       const y = Number(update[1]);
       const z = Number(update[2]);
       let win = false;
-      console.log("Current Space " + x,y,z)
-      win = win || test.checkWin('X',0, 0, z, 1, 1, 0); //down to the right same z
-      win = win || test.checkWin('X',0, 0, z, 1, 1, 1); //down to the right all z
+
+      win = win || test.checkWin('X',0, 0, 0, 1, 1, 0); //down to the right same z
+      win = win || test.checkWin('X',0, 0, 0, 1, 1, 1); //down to the right all z
 
       win = win || test.checkWin('X',3, 0, z , -1, 1, 0); //down to the left same z
-      win = win || test.checkWin('X',3, 0, z , -1, 1, 1); //down to the left all z
+      win = win || test.checkWin('X',3, 0, 0 , -1, 1, 1); //down to the left all z
 
-      test.checkWin(0, 3, z);
-      test.checkWin(3, 3, z);
-
+      win = win || test.checkWin('X',x, 0, 0, 0, 1, 1);
       win = win || test.checkWin('X',x, 0, z, 0, 1, 0);
-      win = win || test.checkWin('X',x, 0, z, 0, 1, 1);
+      win = win || test.checkWin('X',x, 0, z, 0, 1, 0);
 
       win = win || test.checkWin('X',0, y, z, 1, 0, 0);
       win = win || test.checkWin('X',0, y, z, 1, 0, 1);
+      win = win || test.checkWin('X',0, y, 0, 1, 0, 1);
 
       win = win || test.checkWin('X',x, y, 0, 0, 0, 1);
 

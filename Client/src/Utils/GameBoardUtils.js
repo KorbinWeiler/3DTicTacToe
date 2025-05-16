@@ -26,9 +26,7 @@ class GameBoardUtils{
 
         let count = 0;
         while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
-            console.log(x.toString() + y.toString()+ z.toString() + playerValue)
             const tile = this.getTile(x, y, z);
-            console.log(tile.val + " " + playerValue)
             if(tile.val === playerValue){
                 count++;
             }
