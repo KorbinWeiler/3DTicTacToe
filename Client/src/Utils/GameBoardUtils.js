@@ -35,7 +35,6 @@ class GameBoardUtils{
             y += 1 * yScale;
             z += 1 * zScale;
         }
-        console.log(count)
         return count === 4;
 
     }

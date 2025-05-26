@@ -1,5 +1,5 @@
 
-import TileUtils from "./TileUtilsjs";
+import TileUtils from "./TileUtils.js";
 class BoardUtils{
     constructor(z){
         this.board = [];

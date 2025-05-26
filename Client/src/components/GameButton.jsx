@@ -22,7 +22,6 @@ export default function GameButton({x, y, z, Tile}){
             const tileName = x.toString() + y.toString() + z.toString()
 
             player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O')
-            //forceUpdate(Date.now)
         }       
     }
     /*
