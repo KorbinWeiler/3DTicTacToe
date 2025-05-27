@@ -14,6 +14,19 @@ function App() {
   const [update, forceUpdate] = useState("")
 
   const [winner, setWinner] = useState(false)
+
+  async function postPlay(winState){
+    const res = await fetch("SomeServerEnpoint", {
+      method: "POST",
+      body: JSON.stringify({
+        x: update[0],
+        y: update[1],
+        z: update[2],
+        val: update[3],
+        isWin: winState
+      })
+    })
+}
   
   function winCheckRunner(){
 
@@ -53,16 +66,16 @@ function App() {
 
       setWinner(win);
       console.log(win)
+      return win;
     }
-
   }
 
   useEffect(()=>{
     if(test == undefined){
       console.log("Bad Boi")
     }
-    console.log()
-    winCheckRunner()
+    const win = winCheckRunner()
+    //postPlay(win)
   }, [update])
 
   return (
