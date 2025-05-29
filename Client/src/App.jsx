@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { createContext } from 'react'
+import { io } from 'socket.io-client';
 import './App.css'
 import GameBoard from './components/GameBoard'
 import GameBoardUtils from './Utils/GameBoardUtils'
 
-const express = require('express')
-
-const clientServer = express()
+const socket = io('http://localhost:3001');
 
 export const UpdateContext = createContext(null)
 let test = new GameBoardUtils();
@@ -14,6 +13,37 @@ let test = new GameBoardUtils();
 function App() {
   const [count, setCount] = useState(0)
   const [update, forceUpdate] = useState("")
+
+  // BEGINNING
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [room, setRoom] = useState('room1');
+  const [clientId, setClientId] = useState('');
+
+  useEffect(() => {
+    // Store client ID when connected
+    socket.on('connect', () => {
+      setClientId(socket.id);
+      socket.emit('joinRoom', room);
+    });
+
+    // Listen for incoming messages
+    socket.on('receiveMessage', ({ from, text }) => {
+      setMessages((prev) => [...prev, `${from}: ${text}`]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [room]);
+
+  const sendMessage = () => {
+    if (input) {
+      socket.emit('sendMessage', { room, message: input });
+      setInput('');
+    }
+  };
+  //END
 
   const [winner, setWinner] = useState(false)
 
