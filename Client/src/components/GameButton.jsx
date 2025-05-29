@@ -21,7 +21,7 @@ export default function GameButton({x, y, z, Tile}){
             setPlayer(!player);
             const tileName = x.toString() + y.toString() + z.toString()
 
-            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O')
+            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '1') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '1')
         }       
     }
     /*

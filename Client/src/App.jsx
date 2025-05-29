@@ -5,26 +5,34 @@ import './App.css'
 import GameBoard from './components/GameBoard'
 import GameBoardUtils from './Utils/GameBoardUtils'
 
-const socket = io('http://localhost:3001');
+const socket = io('http://localhost:3000');
 
 export const UpdateContext = createContext(null)
 let test = new GameBoardUtils();
+
+const lobbies = {
+  "1": {
+    opponentID: null,
+    board: new GameBoardUtils(),
+    yourTurn: true
+  }
+}
 
 function App() {
   const [count, setCount] = useState(0)
   const [update, forceUpdate] = useState("")
 
+  const [lobbyID, setLobbyID] = useState("1")
+
   // BEGINNING
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [room, setRoom] = useState('room1');
   const [clientId, setClientId] = useState('');
 
   useEffect(() => {
     // Store client ID when connected
     socket.on('connect', () => {
       setClientId(socket.id);
-      socket.emit('joinRoom', room);
     });
 
     // Listen for incoming messages
@@ -35,12 +43,13 @@ function App() {
     return () => {
       socket.disconnect();
     };
-  }, [room]);
+  }, [lobbyID]);
 
   const sendMessage = () => {
-    if (input) {
-      socket.emit('sendMessage', { room, message: input });
-      setInput('');
+    if (update) {
+      socket.to(opponentID).emit(play)
+      //socket.emit('sendMessage', { room, message: input });
+      forceUpdate('');
     }
   };
   //END
@@ -55,6 +64,7 @@ function App() {
         y: update[1],
         z: update[2],
         val: update[3],
+        lobbyID: update.substring(4),
         isWin: winState
       })
     })
@@ -103,17 +113,30 @@ function App() {
   }
 
   useEffect(()=>{
-    if(test == undefined){
-      console.log("Bad Boi")
+    if(lobbies[lobbyID].yourTurn && update){
+      const win = winCheckRunner()
+      lobbies[lobbyID].yourTurn = false;
+
+      const play = {
+        x: update[0],
+        y: update[1],
+        z: update[2],
+        val: update[3],
+        lobbyID: update.substring(4),
+        isWin: win
+      }
+
+      socket.to(lobbies[lobbyID].opponentID).emit(play)
+      forceUpdate('')
+      //postPlay(win)
     }
-    const win = winCheckRunner()
-    //postPlay(win)
   }, [update])
 
+  //move the winner check into the board so that it can change from game to game
   return (
     <>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={test.boards}/>}
+        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobbies[lobbyID].board}/>}
       </UpdateContext.Provider>
     </>
   )
