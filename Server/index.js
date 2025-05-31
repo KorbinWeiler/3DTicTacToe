@@ -13,8 +13,12 @@ const io = new Server(server, {
   }
 });
 
-io.on('connection', (socket) => {
+const userConnections = {};
+
+io.on('connection', (socket, userID) => {
   console.log(`Client connected: ${socket.id}`);
+
+  userConnections[userID] = socket.id;
 
   // Join a room  might need to change this to reflect lobbies better
   socket.on('joinRoom', (roomName) => {
@@ -30,12 +34,32 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('sendPlay', ({opponentID, play}) => {
+    socket.to(userConnections[opponentID]).emit({
+      opponentPlay: play
+    })
+  })
+
+  socket.on('invite', ({opponentID, senderID}) => {
+    socket.to(userConnections[opponentID]).emit({
+      senderID: senderID
+    })
+  })
+
+  socket.on('acceptInvite', ({opponentID, hostID}) =>{
+    socket.to(userConnections[opponentID]).emit({
+      lobbyID: 1,
+      yourTurn: true,
+      board: null
+    })
+  })
+
   socket.on('disconnect', () => {
     console.log(`Client disconnected: ${socket.id}`);
   });
 });
 
-const PORT = 3001;
+const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`Socket.IO server running at http://localhost:${PORT}`);
 });
