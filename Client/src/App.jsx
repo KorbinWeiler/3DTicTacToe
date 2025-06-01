@@ -1,4 +1,4 @@
-import GameUI from "./components/GameUI"
+import GamePage from "./pages/GamePage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 export default function App(){
@@ -6,7 +6,7 @@ export default function App(){
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<GameUI/>}/>
+          <Route path="/" element={<GamePage/>}/>
         </Routes>
       </Router>
     </>

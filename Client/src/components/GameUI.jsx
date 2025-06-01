@@ -134,9 +134,10 @@ function GameUI() {
         lobbyID: update.substring(4),
         isWin: win
       }
+      console.log("update")
 
-      socket.to(lobbies[lobbyID].opponentID).emit(play)
-      forceUpdate('')
+      //socket.to(lobbies[lobbyID].opponentID).emit(play)
+      //forceUpdate('')
       //postPlay(win)
     }
   }, [update])
