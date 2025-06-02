@@ -1,15 +1,33 @@
 @import "tailwindcss";
 
+/*General Styles*/
+
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  width: 100vw;
+  min-height: 100vh;
+
+  --boardSize: 15rem;
 }
 
 body{
-  background-color: black;
+  background-color: #1C1C1c;
 }
+
+.uiBox{
+  height: 100%;
+  width: 100%;
+}
+
+.game{
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+
+/*Game Board Styles*/
 
 .default{
   background-color: white;
@@ -18,9 +36,82 @@ body{
 }
 
 .light{
-  color: red
+  color: red;
 }
 
 .dark{
   color: green;
+}
+
+.board{
+
+  width: calc(var(--boardSize) * 0.66);
+  height: calc(var(--boardSize) * 0.33);
+  margin: 2rem;
+  justify-self: center;
+  justify-items: center;
+  background-color: #4a4a4a;
+  transform: skew(-40deg);
+  transition-duration: 1s;
+
+  .square{
+    height: 1rem;
+    width: 3rem;
+    background-color: #1C1C1c;
+    transition-duration: 1s;
+  }
+}
+
+.bottom{
+  margin-bottom: 0px;
+}
+
+.board:hover{
+  transition-duration: 1s;
+  transform: skew(0deg);
+  height: var(--boardSize);
+  width: var(--boardSize);
+
+  .square{
+    height: 5rem;
+    width: 5rem;
+    background-color: #1C1C1c;
+    transition-duration: 1s;
+  }
+}
+
+.BoardButton{
+  justify-content: center;
+  align-items: middle;
+  background-color: white;
+  margin: 3px;
+}
+
+/*Navbar Styles*/
+
+.navbar{
+  width:100%;
+  min-height: 3rem;
+  background-color: #4a4a4a;
+  justify-self: center;
+  align-self: baseline;
+  border-radius: 10px;
+}
+
+/*Sidebar Styles*/
+
+.sidebar{
+  width: 15vw;
+  min-width: 10rem;
+  /*height: calc(100% - 3vw - 1em);*/
+  height: 20rem;
+  justify-content: start;
+  background-color: #4a4a4a;
+  border-radius: 10px;
+  margin-top: 1em;
+  
+}
+
+.sidebar:hover{
+  height: 10rem;
 }

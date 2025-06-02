@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { createContext } from 'react'
 import { io } from 'socket.io-client';
-import '../App.css'
+import "../../App.css"
 import GameBoard from './GameBoard'
-import GameBoardUtils from '../Utils/GameBoardUtils'
+import GameBoardUtils from '../../Utils/GameBoardUtils'
 import { useLocation } from 'react-router-dom';
 
 const socket = io('http://localhost:3000');

@@ -1,4 +1,4 @@
-import "../App.css"
+import "../../App.css"
 import { useState, useEffect, useContext } from "react"
 import { UpdateContext } from "./GameUI";
 import { playerContext } from "./GameBoard";
@@ -12,7 +12,7 @@ export default function GameButton({x, y, z, Tile}){
     const [update, forceUpdate] = updates;
     const [player, setPlayer] = players
 
-    const stylePresets = "default m-1 w-10 h-10"
+    const stylePresets = "default m-1 w-10 h-10 BoardButton"
 
     function updateTile(){
         if(Tile.val === " " || style === "default"){
