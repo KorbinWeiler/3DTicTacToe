@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { createContext } from 'react'
-import { io } from 'socket.io-client';
 import '../App.css'
 import GameBoard from './GameBoard'
 import GameBoardUtils from '../Utils/GameBoardUtils'
 import { useLocation } from 'react-router-dom';
-
-const socket = io('http://localhost:3000');
+import { UserContext } from '../App'
 
 export const UpdateContext = createContext(null)
 let test = new GameBoardUtils();
@@ -26,6 +24,8 @@ function GameUI() {
   const id = queryParams.get('id');
   const [count, setCount] = useState(0)
   const [update, forceUpdate] = useState("")
+  const {Socket} = useContext(UserContext)
+  const socket = Socket
 
   console.log(id)
 
@@ -124,7 +124,7 @@ function GameUI() {
   useEffect(()=>{
     if(lobbies[lobbyID].yourTurn && update){
       const win = winCheckRunner()
-      lobbies[lobbyID].yourTurn = false;
+      //lobbies[lobbyID].yourTurn = false;
 
       const play = {
         x: update[0],
@@ -134,7 +134,6 @@ function GameUI() {
         lobbyID: update.substring(4),
         isWin: win
       }
-      console.log("update")
 
       //socket.to(lobbies[lobbyID].opponentID).emit(play)
       //forceUpdate('')
@@ -142,7 +141,6 @@ function GameUI() {
     }
   }, [update])
 
-  //move the winner check into the board so that it can change from game to game
   return (
     <>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>

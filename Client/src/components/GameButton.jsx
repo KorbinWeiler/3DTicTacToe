@@ -18,11 +18,11 @@ export default function GameButton({x, y, z, Tile}){
         if(Tile.val === " " || style === "default"){
             player ? setStyle("light") : setStyle("dark");
             player ? Tile.val = "X" : Tile.val="O";
-            setPlayer(!player);
+            console.log(Tile.val)
             const tileName = x.toString() + y.toString() + z.toString()
-            console.log(tileName)
-
-            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '1') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '1')
+            const string = player ? x.toString() + y.toString() + z.toString() + 'X' + '1' : x.toString() + y.toString() + z.toString() + 'O' + '1'
+            forceUpdate(string)
+            setPlayer(!player);
         }       
     }
     /*
