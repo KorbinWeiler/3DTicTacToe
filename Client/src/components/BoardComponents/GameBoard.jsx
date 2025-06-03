@@ -1,4 +1,5 @@
 import Board from "./Board"
+import "../../App.css"
 import { useState, createContext, useEffect } from "react"
 
 export const playerContext = createContext(null)

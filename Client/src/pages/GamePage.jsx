@@ -1,6 +1,8 @@
 import GameUI from "../components/BoardComponents/GameUI"
 import Navbar from "../components/PageComponents/NavBar"
 import Sidebar from "../components/PageComponents/Sidebar"
+//import GameUI from "../components/BoardComponents/GameUI"
+import GameBoard from "../components/BoardComponents/GameBoard"
 import "../App.css"
 
 export default function GamePage(){
@@ -8,10 +10,7 @@ export default function GamePage(){
         <div className="uiBox">
             <Navbar className="align-baseline"></Navbar>
             <div className="game">
-            <Sidebar></Sidebar>
-            <Sidebar></Sidebar>
-            <Sidebar></Sidebar>
-            <Sidebar className="bottom"></Sidebar>
+                <GameUI></GameUI>
             </div>
         </div>
     )

@@ -2,7 +2,7 @@ import GameButton from "./GameButton"
 export default function Board({z, BackendBoard}){
     return (
         <>
-            <div className="grid grid-cols-4 m-5">
+            <div className="grid grid-cols-4 board">
 
                 <GameButton x={0} y={0} z={z} Tile={BackendBoard[0][0]}/>
                 <GameButton x={1} y={0} z={z} Tile={BackendBoard[1][0]}/>

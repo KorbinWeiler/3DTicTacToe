@@ -4,7 +4,7 @@ import { UpdateContext } from "./GameUI";
 import { playerContext } from "./GameBoard";
 
 export default function GameButton({x, y, z, Tile}){
-    const [style, setStyle] = useState("light");
+    const [style, setStyle] = useState("default");
     const [text, setText] = useState("")
 
     const {updates} = useContext(UpdateContext)
@@ -12,7 +12,7 @@ export default function GameButton({x, y, z, Tile}){
     const [update, forceUpdate] = updates;
     const [player, setPlayer] = players
 
-    const stylePresets = "default m-1 w-10 h-10 BoardButton"
+    const stylePresets = "default square"
 
     function updateTile(){
         if(Tile.val === " " || style === "default"){
@@ -33,7 +33,7 @@ export default function GameButton({x, y, z, Tile}){
 
     return (
         <>
-            <button className={stylePresets.concat(" " + style)} onClick={updateTile}>{Tile.val}</button>
+            <button className={stylePresets.concat(" " + style)} onClick={updateTile}></button>
         </>
     )
 }
