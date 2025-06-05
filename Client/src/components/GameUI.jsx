@@ -6,7 +6,7 @@ import GameBoard from './GameBoard'
 import GameBoardUtils from '../Utils/GameBoardUtils'
 import { useLocation } from 'react-router-dom';
 
-const socket = io('http://localhost:3000');
+const socket = io('http://localhost:3000', {autoConnect: false});
 
 export const UpdateContext = createContext(null)
 let test = new GameBoardUtils();
@@ -25,7 +25,6 @@ function GameUI({playerID, opponentID}) {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get('id');
-  const [count, setCount] = useState(0)
   const [update, forceUpdate] = useState("")
 
   const [lobbyID, setLobbyID] = useState("1")
@@ -34,14 +33,10 @@ function GameUI({playerID, opponentID}) {
 
   // BEGINNING
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [clientID, setClientId] = useState(playerID);
-  console.log(playerID)
 
   useEffect(() => {
     // Store client ID when connected
     socket.on('connect', ({userID}) => { //change this to only connect if there is a user id or maybe into app.jsx/gamepage.jsx
-      setClientId(socket.id);
     });
 
     // Listen for incoming messages
@@ -52,7 +47,7 @@ function GameUI({playerID, opponentID}) {
     return () => {
       socket.disconnect();
     };
-  }, [clientID]);
+  }, []);
 
   const sendMessage = () => {
     if (update) {

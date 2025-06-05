@@ -35,6 +35,7 @@ io.on('connection', (socket, userID) => {
   });
 
   socket.on('sendPlay', ({play, opponentID}) => {
+    console.log(play)
     socket.to(userConnections[opponentID]).emit({
       opponentPlay: play
     })
