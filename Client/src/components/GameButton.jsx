@@ -4,8 +4,7 @@ import { UpdateContext } from "./GameUI";
 import { playerContext } from "./GameBoard";
 
 export default function GameButton({x, y, z, Tile}){
-    const [style, setStyle] = useState("light");
-    const [text, setText] = useState("")
+    const [style, setStyle] = useState("default");
 
     const {updates} = useContext(UpdateContext)
     const {players} = useContext(playerContext)
@@ -20,16 +19,10 @@ export default function GameButton({x, y, z, Tile}){
             player ? Tile.val = "X" : Tile.val="O";
             setPlayer(!player);
             const tileName = x.toString() + y.toString() + z.toString()
-            console.log(tileName)
 
             player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '1') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '1')
         }       
     }
-    /*
-    useEffect(()=>{
-        console.log("hit")
-    }, [update])
-    */
 
     return (
         <>

@@ -18,9 +18,9 @@ body{
 }
 
 .light{
-  color: red
+  background-color: red;
 }
 
 .dark{
-  color: green;
+background-color: green;
 }

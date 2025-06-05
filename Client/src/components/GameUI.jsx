@@ -11,23 +11,22 @@ const socket = io('http://localhost:3000');
 export const UpdateContext = createContext(null)
 let test = new GameBoardUtils();
 
+//move lobbies to game page eventually
 const lobbies = {
   "1": {
-    opponentID: null,
+    opponentID: 12,
     board: new GameBoardUtils(),
     yourTurn: true
   }
 }
 
-function GameUI() {
+function GameUI({playerID, opponentID}) {
     
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get('id');
   const [count, setCount] = useState(0)
   const [update, forceUpdate] = useState("")
-
-  console.log(id)
 
   const [lobbyID, setLobbyID] = useState("1")
 
@@ -36,11 +35,12 @@ function GameUI() {
   // BEGINNING
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [clientID, setClientId] = useState(id);
+  const [clientID, setClientId] = useState(playerID);
+  console.log(playerID)
 
   useEffect(() => {
     // Store client ID when connected
-    socket.on('connect', ({userID}) => {
+    socket.on('connect', ({userID}) => { //change this to only connect if there is a user id or maybe into app.jsx/gamepage.jsx
       setClientId(socket.id);
     });
 
@@ -56,29 +56,15 @@ function GameUI() {
 
   const sendMessage = () => {
     if (update) {
-      socket.to(opponentID).emit(play)
-      //socket.emit('sendMessage', { room, message: input });
+      socket.emit("sendPlay", {play, opponentID})
       forceUpdate('');
     }
   };
+
   //END
 
   const [winner, setWinner] = useState(false)
 
-  async function postPlay(winState){
-    const res = await fetch("SomeServerEnpoint", {
-      method: "POST",
-      body: JSON.stringify({
-        x: update[0],
-        y: update[1],
-        z: update[2],
-        val: update[3],
-        lobbyID: update.substring(4),
-        isWin: winState
-      })
-    })
-}
-  
   function winCheckRunner(){
 
     //Corners
@@ -125,8 +111,7 @@ function GameUI() {
   useEffect(()=>{
     if(lobbies[lobbyID].yourTurn && update){
       const win = winCheckRunner()
-      lobbies[lobbyID].yourTurn = false;
-
+      //lobbies[lobbyID].yourTurn = false;
       const play = {
         x: update[0],
         y: update[1],
@@ -135,17 +120,17 @@ function GameUI() {
         lobbyID: update.substring(4),
         isWin: win
       }
-      console.log("update")
 
       //socket.to(lobbies[lobbyID].opponentID).emit(play)
-      //forceUpdate('')
-      //postPlay(win)
+      socket.emit("sendPlay", {play, opponentID})
     }
   }, [update])
 
   //move the winner check into the board so that it can change from game to game
   return (
     <>
+      <p>{playerID ?  playerID : "no Player ID"}</p>
+      <p>{opponentID ? opponentID : "No Opponent"}</p>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
         {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobbies[lobbyID].board}/>}
       </UpdateContext.Provider>
