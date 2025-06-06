@@ -12,6 +12,10 @@ class GameBoardUtils{
         return this.boards[z].board[x][y]
     }
 
+    setTile(x,y,x,newValue){
+        this.boards[z].board[x][y].val = newValue
+    }
+
     //Corners
     //x: 0, y: 0, z: z
     //x: 3, y: 0, z: z

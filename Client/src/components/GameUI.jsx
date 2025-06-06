@@ -1,30 +1,14 @@
 import { useState, useEffect } from 'react'
 import { createContext } from 'react'
-import { io } from 'socket.io-client';
 import '../App.css'
 import GameBoard from './GameBoard'
 import GameBoardUtils from '../Utils/GameBoardUtils'
-import { useLocation } from 'react-router-dom';
-
-const socket = io('http://localhost:3000', {autoConnect: false});
 
 export const UpdateContext = createContext(null)
 let test = new GameBoardUtils();
 
-//move lobbies to game page eventually
-const lobbies = {
-  "1": {
-    opponentID: 12,
-    board: new GameBoardUtils(),
-    yourTurn: true
-  }
-}
-
-function GameUI({playerID, opponentID}) {
+function GameUI({lobbyInfo}) {
     
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const id = queryParams.get('id');
   const [update, forceUpdate] = useState("")
 
   const [lobbyID, setLobbyID] = useState("1")
@@ -49,12 +33,12 @@ function GameUI({playerID, opponentID}) {
     };
   }, []);
 
-  const sendMessage = () => {
-    if (update) {
-      socket.emit("sendPlay", {play, opponentID})
-      forceUpdate('');
-    }
-  };
+  // const sendMessage = () => {
+  //   if (update) {
+  //     socket.emit("sendPlay", {play, opponentID})
+  //     forceUpdate('');
+  //   }
+  // };
 
   //END
 
@@ -124,10 +108,10 @@ function GameUI({playerID, opponentID}) {
   //move the winner check into the board so that it can change from game to game
   return (
     <>
-      <p>{playerID ?  playerID : "no Player ID"}</p>
-      <p>{opponentID ? opponentID : "No Opponent"}</p>
+      <p>{lobbyInfo.playerID ?  lobbyInfo.playerID : "no Player ID"}</p>
+      <p>{lobbyInfo.opponentID ? lobbyInfo.opponentID : "No Opponent"}</p>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobbies[lobbyID].board}/>}
+        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobbyInfo.board}/>}
       </UpdateContext.Provider>
     </>
   )

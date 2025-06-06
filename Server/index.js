@@ -36,13 +36,13 @@ io.on('connection', (socket, userID) => {
 
   socket.on('sendPlay', ({play, opponentID}) => {
     console.log(play)
-    socket.to(userConnections[opponentID]).emit({
+    socket.to(userConnections[opponentID]).emit("recieve play", {
       opponentPlay: play
     })
   })
 
   socket.on('invite', ({opponentID, senderID}) => {
-    socket.to(userConnections[opponentID]).emit({
+    socket.to(userConnections[opponentID]).emit("game invite", {
       senderID: senderID
     })
   })
