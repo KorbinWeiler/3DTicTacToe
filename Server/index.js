@@ -15,33 +15,38 @@ const io = new Server(server, {
 
 const userConnections = {};
 
-io.on('connection', (socket, userID) => {
+io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
+  const userID = socket.handshake.auth.clientID
+  console.log(userID)
+
   userConnections[userID] = socket.id;
+  console.log(userConnections);
 
-  // Join a room  might need to change this to reflect lobbies better
-  socket.on('joinRoom', (roomName) => {
-    socket.join(roomName);
-    console.log(`Client ${socket.id} joined room ${roomName}`);
-  });
+  // // Join a room  might need to change this to reflect lobbies better
+  // socket.on('joinRoom', (roomName) => {
+  //   socket.join(roomName);
+  //   console.log(`Client ${socket.id} joined room ${roomName}`);
+  // });
 
-  // Receive and broadcast message   might need to update this to send messages better
-  socket.on('sendMessage', ({ room, message }) => {
-    io.to(room).emit('receiveMessage', {
-      from: socket.id,
-      text: message
-    });
-  });
+  // // Receive and broadcast message   might need to update this to send messages better
+  // socket.on('sendMessage', ({ room, message }) => {
+  //   io.to(room).emit('receiveMessage', {
+  //     from: socket.id,
+  //     text: message
+  //   });
+  // });
 
-  socket.on('sendPlay', ({opponentID, play}) => {
-    socket.to(userConnections[opponentID]).emit({
+  socket.on('sendPlay', ({play, opponentID}) => {
+    console.log(play)
+    socket.to(userConnections[opponentID]).emit("recieve play", {
       opponentPlay: play
     })
   })
 
   socket.on('invite', ({opponentID, senderID}) => {
-    socket.to(userConnections[opponentID]).emit({
+    socket.to(userConnections[opponentID]).emit("game invite", {
       senderID: senderID
     })
   })

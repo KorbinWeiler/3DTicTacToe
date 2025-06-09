@@ -2,83 +2,30 @@ import { useState, useEffect, useContext } from 'react'
 import { createContext } from 'react'
 import '../App.css'
 import GameBoard from './GameBoard'
-import GameBoardUtils from '../Utils/GameBoardUtils'
-import { useLocation } from 'react-router-dom';
-import { UserContext } from '../App'
+import { gameContext } from '../App'
+import GameBoardUtils from "../Utils/GameBoardUtils"
 
 export const UpdateContext = createContext(null)
-let test = new GameBoardUtils();
 
-const lobbies = {
-  "1": {
-    opponentID: null,
-    board: new GameBoardUtils(),
-    yourTurn: true
-  }
-}
+function GameUI({lobby}) {
+  
+  const [update, forceUpdate] = useState("") //keep this and send from the socket here?
+  //const [lobbyID, setLobbyID] = useState("1") //remove and get from a context
 
-function GameUI() {
-    
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const id = queryParams.get('id');
-  const [count, setCount] = useState(0)
-  const [update, forceUpdate] = useState("")
-  const {Socket} = useContext(UserContext)
-  const socket = Socket
-
-  console.log(id)
-
-  const [lobbyID, setLobbyID] = useState("1")
+  const {Socket, ClientID} = useContext(gameContext);
+  const socket = Socket;
+  const [clientID, setClientID] = ClientID
 
   //http://localhost:5173/?id=111
 
-  // BEGINNING
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [clientID, setClientId] = useState(id);
-
-  useEffect(() => {
-    // Store client ID when connected
-    socket.on('connect', ({userID}) => {
-      setClientId(socket.id);
-    });
-
-    // Listen for incoming messages
-    socket.on('receiveMessage', ({ from, text }) => {
-      setMessages((prev) => [...prev, `${from}: ${text}`]);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [clientID]);
-
-  const sendMessage = () => {
-    if (update) {
-      socket.to(opponentID).emit(play)
-      //socket.emit('sendMessage', { room, message: input });
-      forceUpdate('');
-    }
-  };
-  //END
-
   const [winner, setWinner] = useState(false)
 
-  async function postPlay(winState){
-    const res = await fetch("SomeServerEnpoint", {
-      method: "POST",
-      body: JSON.stringify({
-        x: update[0],
-        y: update[1],
-        z: update[2],
-        val: update[3],
-        lobbyID: update.substring(4),
-        isWin: winState
-      })
-    })
-}
-  
+  // if(lobby.board){
+  //   lobby.board = new GameBoardUtils()
+  // }
+
+  const opponentID = ""
+
   function winCheckRunner(){
 
     //Corners
@@ -97,36 +44,35 @@ function GameUI() {
       const y = Number(update[1]);
       const z = Number(update[2]);
       const playerVlaue = update[3];
-      const lobby = update.substring(4)
+      const lobbyID = update.substring(4)
       let win = false;
 
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,0, 0, 0, 1, 1, 0); //down to the right same z
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,0, 0, 0, 1, 1, 1); //down to the right all z
+      //Can I put this in a loop somehow to make it look nicer
+      win = win || lobby.board.checkWin(playerVlaue,0, 0, 0, 1, 1, 0); //down to the right same z
+      win = win || lobby.board.checkWin(playerVlaue,0, 0, 0, 1, 1, 1); //down to the right all z
 
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,3, 0, z , -1, 1, 0); //down to the left same z
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,3, 0, 0 , -1, 1, 1); //down to the left all z
+      win = win || lobby.board.checkWin(playerVlaue,3, 0, z , -1, 1, 0); //down to the left same z
+      win = win || lobby.board.checkWin(playerVlaue,3, 0, 0 , -1, 1, 1); //down to the left all z
 
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,x, 0, 0, 0, 1, 1);
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,x, 0, z, 0, 1, 0);
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,x, 0, z, 0, 1, 0);
+      win = win || lobby.board.checkWin(playerVlaue,x, 0, 0, 0, 1, 1);
+      win = win || lobby.board.checkWin(playerVlaue,x, 0, z, 0, 1, 0);
+      win = win || lobby.board.checkWin(playerVlaue,x, 0, z, 0, 1, 0);
 
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,0, y, z, 1, 0, 0);
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,0, y, z, 1, 0, 1);
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,0, y, 0, 1, 0, 1);
+      win = win || lobby.board.checkWin(playerVlaue,0, y, z, 1, 0, 0);
+      win = win || lobby.board.checkWin(playerVlaue,0, y, z, 1, 0, 1);
+      win = win || lobby.board.checkWin(playerVlaue,0, y, 0, 1, 0, 1);
 
-      win = win || lobbies[lobby].board.checkWin(playerVlaue,x, y, 0, 0, 0, 1);
+      win = win || lobby.board.checkWin(playerVlaue,x, y, 0, 0, 0, 1);
 
       setWinner(win);
-      console.log(win)
       return win;
     }
   }
 
   useEffect(()=>{
-    if(lobbies[lobbyID].yourTurn && update){
+    if(lobby.yourTurn && update){
       const win = winCheckRunner()
       //lobbies[lobbyID].yourTurn = false;
-
       const play = {
         x: update[0],
         y: update[1],
@@ -136,16 +82,17 @@ function GameUI() {
         isWin: win
       }
 
-      //socket.to(lobbies[lobbyID].opponentID).emit(play)
-      //forceUpdate('')
-      //postPlay(win)
+      //socket.emit("sendPlay", opponentID, play)
+      socket.emit("test message", play)
     }
   }, [update])
 
   return (
     <>
+      <p>{clientID ?  clientID : "no Player ID"}</p>
+      <p>{opponentID ? opponentID : "No Opponent"}</p>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobbies[lobbyID].board}/>}
+        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={new GameBoardUtils()}/>}
       </UpdateContext.Provider>
     </>
   )

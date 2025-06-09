@@ -1,35 +1,34 @@
 import "../App.css"
-import { useState, useEffect, useContext } from "react"
+import { useState, useContext } from "react"
 import { UpdateContext } from "./GameUI";
 import { playerContext } from "./GameBoard";
+import { gameContext } from "../App";
 
 export default function GameButton({x, y, z, Tile}){
-    const [style, setStyle] = useState("light");
-    const [text, setText] = useState("")
 
+    //do these all have to be useStates?
+    const [style, setStyle] = useState("default");
     const {updates} = useContext(UpdateContext)
     const {players} = useContext(playerContext)
+    const {ClientID} = useContext(gameContext) 
+
+    const [clientID, setClientID] = ClientID
+
+    //would it be easier just to pass a player value?
     const [update, forceUpdate] = updates;
     const [player, setPlayer] = players
 
-    const stylePresets = "default m-1 w-10 h-10"
+    const stylePresets = "default m-1 w-10 h-10" //switch to pure css
 
     function updateTile(){
         if(Tile.val === " " || style === "default"){
             player ? setStyle("light") : setStyle("dark");
-            player ? Tile.val = "X" : Tile.val="O";
-            console.log(Tile.val)
-            const tileName = x.toString() + y.toString() + z.toString()
-            const string = player ? x.toString() + y.toString() + z.toString() + 'X' + '1' : x.toString() + y.toString() + z.toString() + 'O' + '1'
-            forceUpdate(string)
-            setPlayer(!player);
+            player ? Tile.val = "X" : Tile.val="O"; //maybe rework once playerIDs are being used
+            setPlayer(!player); //remove once multiplayer is implemented
+
+            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '1') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '1')
         }       
     }
-    /*
-    useEffect(()=>{
-        console.log("hit")
-    }, [update])
-    */
 
     return (
         <>
