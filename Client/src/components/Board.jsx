@@ -1,8 +1,20 @@
 import GameButton from "./GameButton"
 export default function Board({z, BackendBoard}){
+    //this one can definitely be a for loop
+    //and get the that tailwind out of there
+    const boardButtons= [];
+
+    for(let i = 0; i < 4; ++i){
+        for(let j = 0; j < 4; ++j){
+            //boardButtons += <GameButton x={j} y={i} z={z} Tile={BackendBoard[j][i]}/>
+        }
+    }
+
     return (
         <>
             <div className="grid grid-cols-4 m-5">
+
+                {/* {boardButtons} */}
 
                 <GameButton x={0} y={0} z={z} Tile={BackendBoard[0][0]}/>
                 <GameButton x={1} y={0} z={z} Tile={BackendBoard[1][0]}/>

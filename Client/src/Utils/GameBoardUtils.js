@@ -12,7 +12,7 @@ class GameBoardUtils{
         return this.boards[z].board[x][y]
     }
 
-    setTile(x,y,x,newValue){
+    setTile(x,y,z,newValue){
         this.boards[z].board[x][y].val = newValue
     }
 

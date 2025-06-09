@@ -4,9 +4,10 @@ import { useState, createContext, useEffect } from "react"
 export const playerContext = createContext(null)
 
 export default function GameBoard({BackendGameBoard}){
-    const [player, setPlayer] = useState(true);
+    const [player, setPlayer] = useState(true); //move this to app.jsx in the player details
     const tempBoards = BackendGameBoard.boards
 
+    //Could be created with a for loop
     return(
         <>
         <playerContext.Provider value={{players: [player, setPlayer]}}>
