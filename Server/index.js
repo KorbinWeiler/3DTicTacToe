@@ -15,6 +15,20 @@ const io = new Server(server, {
 
 const userConnections = {};
 
+function initLobbyStack(count){
+  const tempStack = []
+  for(let i = 0; i < count; ++i){
+    tempStack += i;
+  }
+  return tempStack;
+}
+
+const lobbyStack = initLobbyStack();
+
+function getLobbyID(){
+  return lobbyStack.pop();
+}
+
 io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
@@ -57,6 +71,10 @@ io.on('connection', (socket) => {
       yourTurn: true,
       board: null
     })
+
+    const lobby = getLobbyID();
+    socket.to(userConnections[hostID]).emit("add game", lobby, opponentID, hostID)
+    socket.to(userConnections[opponentID]).emit("add game", lobby, opponentID, hostID)
   })
 
   socket.on('disconnect', () => {

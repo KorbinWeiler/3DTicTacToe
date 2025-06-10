@@ -8,6 +8,7 @@ export default function GameButton({x, y, z, Tile}){
 
     //do these all have to be useStates?
     const [style, setStyle] = useState("default");
+    
     const {updates} = useContext(UpdateContext)
     const {players} = useContext(playerContext)
     const {ClientID} = useContext(gameContext) 
