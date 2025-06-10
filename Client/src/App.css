@@ -16,6 +16,15 @@ body{
   background-color: #1C1C1c;
 }
 
+button{
+  color: black;
+}
+
+.error{
+  color: red;
+  border-color: red;
+}
+
 .content-box{
   display: flex;
   justify-content: center;
@@ -148,4 +157,35 @@ body{
 .play-stats{
   width: calc(100% / 4);
   min-width: 10rem;
+}
+
+.icon{
+  margin: 5px;
+  justify-self: center;
+  width: 70%;
+  padding-top: 70%;
+  background-color: white;
+}
+
+.icon:hover{
+  filter: 'invert(1) sepia(1) saturate(10000%) hue-rotate(12deg)'
+}
+
+/*Login*/
+
+.login-form{
+  display:inline-block;
+  width: 20%;
+  justify-items: center;
+  justify-content: center;
+  background-color: #4a4a4a;
+  border-radius: 10px;
+  color: white;
+  padding: 5px;
+}
+
+.input{
+  margin: 5px;
+  border:solid;
+  border-radius: 5px;
 }
