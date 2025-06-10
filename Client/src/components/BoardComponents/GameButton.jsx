@@ -1,5 +1,7 @@
 import "../App.css"
 import { useState, useContext } from "react"
+import "../../App.css"
+import { useState, useEffect, useContext } from "react"
 import { UpdateContext } from "./GameUI";
 import { playerContext } from "./GameBoard";
 import { gameContext } from "../App";
@@ -19,7 +21,8 @@ export default function GameButton({x, y, z, Tile}){
     const [update, forceUpdate] = updates;
     const [player, setPlayer] = players
 
-    const stylePresets = "default m-1 w-10 h-10" //switch to pure css
+
+    const stylePresets = "default square"
 
     function updateTile(){
         if(Tile.val === " " || style === "default"){
@@ -33,7 +36,7 @@ export default function GameButton({x, y, z, Tile}){
 
     return (
         <>
-            <button className={stylePresets.concat(" " + style)} onClick={updateTile}>{Tile.val}</button>
+            <button className={stylePresets.concat(" " + style)} onClick={updateTile}></button>
         </>
     )
 }

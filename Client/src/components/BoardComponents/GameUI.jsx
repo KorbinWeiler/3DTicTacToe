@@ -1,9 +1,13 @@
 import { useState, useEffect, useContext } from 'react'
 import { createContext } from 'react'
-import '../App.css'
 import GameBoard from './GameBoard'
 import { gameContext } from '../App'
-import GameBoardUtils from "../Utils/GameBoardUtils"
+
+import { io } from 'socket.io-client';
+import "../../App.css"
+import GameBoardUtils from '../../Utils/GameBoardUtils'
+import { useLocation } from 'react-router-dom';
+
 
 export const UpdateContext = createContext(null)
 
@@ -73,6 +77,7 @@ function GameUI({lobby}) {
     if(lobby.yourTurn && update){
       const win = winCheckRunner()
       //lobbies[lobbyID].yourTurn = false;
+
       const play = {
         x: update[0],
         y: update[1],
@@ -92,7 +97,7 @@ function GameUI({lobby}) {
       <p>{clientID ?  clientID : "no Player ID"}</p>
       <p>{opponentID ? opponentID : "No Opponent"}</p>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={new GameBoardUtils()}/>}
+        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobby.board}/>}
       </UpdateContext.Provider>
     </>
   )

@@ -1,4 +1,7 @@
+import TempGamePage from "./pages/TempGamePage";
 import GamePage from "./pages/GamePage";
+import LoginPage from "./pages/LoginPage";
+import InvitePage from "./pages/InvitePage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { io } from 'socket.io-client';
 import {useEffect, useState, createContext} from "react"
@@ -81,7 +84,10 @@ export default function App(){
     <gameContext.Provider value={{Lobbies: games, ClientID: [clientID, setClientID], Socket: socket}}>
       <Router>
         <Routes>
-            <Route path="/" element={<GamePage/>}/>
+          <Route path="/" element={<TempGamePage/>}/>
+          <Route path="/test" element={<GamePage/>}/>
+          <Route path="/Login" element={<LoginPage/>}/>
+          <Route path="/Invites" element={<InvitePage/>}/>
         </Routes>
       </Router>
       </gameContext.Provider>
