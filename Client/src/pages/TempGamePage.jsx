@@ -1,7 +1,16 @@
 import GameUI from "../components/BoardComponents/GameUI"
+import { useState, useContext } from "react"
+import { gameContext } from "../App";
 import "../App.css"
 
 export default function TempGamePage(){
+
+    const {Lobbies, ClientID} = useContext(gameContext)
+    const [clientID, setClientID] = ClientID
+    const currentLobbies = Lobbies;
+
+    const lobbyID = 1
+
     function fuckall(){
         console.log("idk man")
     }
@@ -21,7 +30,7 @@ export default function TempGamePage(){
                 </form>
             </div>
             <div className="w-[70%]">
-                <GameUI/>
+                <GameUI lobby={currentLobbies[lobbyID]}/>
             </div>
         </div>
     )

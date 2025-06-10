@@ -35,40 +35,42 @@ export default function GamePage({socket}){
     }
 
     //make a create lobby button
-    return (
-        <div className="grid grid-cols-2">
-            <div className="align-middle m-2  justify-items-start">
-                <form className="m-2">
-                    <label>userID</label>
-                    <input className="border rounded" type="text" placeholder="UserId" id="userid" onChange={(e)=>{setTempPlayerID(e.target.value)}}></input>
-                    <button className="text-blackck" type="button" text="Set UserID" id="opponentid" onClick={newPlayerID}></button>
-                </form>
-                <form className="m-2">
-                    <label>OpponentID</label>
-                    <input className="border rounded" type="text" placeholder="UserId" onChange={(e)=>{setTempOpponentID(e.target.value)}}></input>
-                    <button className="text-black" type="button" text="Send Invite" onClick={newOpponentID}></button>
-                </form>
+//     return (
+//         <div className="grid grid-cols-2">
+//             <div className="align-middle m-2  justify-items-start">
+//                 <form className="m-2">
+//                     <label>userID</label>
+//                     <input className="border rounded" type="text" placeholder="UserId" id="userid" onChange={(e)=>{setTempPlayerID(e.target.value)}}></input>
+//                     <button className="text-blackck" type="button" text="Set UserID" id="opponentid" onClick={newPlayerID}></button>
+//                 </form>
+//                 <form className="m-2">
+//                     <label>OpponentID</label>
+//                     <input className="border rounded" type="text" placeholder="UserId" onChange={(e)=>{setTempOpponentID(e.target.value)}}></input>
+//                     <button className="text-black" type="button" text="Send Invite" onClick={newOpponentID}></button>
+//                 </form>
+//             </div>
+//             <div>
+//                 <GameUI lobby={currentLobbies[lobbyID]}/>
+//             </div>
+//         </div>
+//     )
+// }
+
+    return(
+        <div className="uiBox">
+            <div className="sidebar navigation background-dark2 border border-thin">
+            <Sidebar content={<Navbar/>}></Sidebar>
             </div>
-            <div>
-                <GameUI lobby={currentLobbies[lobbyID]}/>
+            <div className="content-box">
+                <div className="game border border-thin background-dark2">
+                    <GameUI lobby={currentLobbies[lobbyID]}/>
+                </div>
+            </div>
+            <div  className="sidebar play-stats background-dark2 border border-thin">
+            <Sidebar></Sidebar>
             </div>
         </div>
     )
 }
-
-//<Navbar className="align-baseline"></Navbar>
-// export default function GamePage(){
-//     return(
-//         <div className="uiBox">
-//             <div className="sidebar navigation background-dark2 border border-thin">
-//             <Sidebar content={<Navbar/>}></Sidebar>
-//             </div>
-//             <div className="content-box">
-//                 <div className="game border border-thin background-dark2">
-//                     <GameUI></GameUI>
-//                 </div>
-//             </div>
-//             <div  className="sidebar play-stats background-dark2 border border-thin">
-//             <Sidebar></Sidebar>
 
             

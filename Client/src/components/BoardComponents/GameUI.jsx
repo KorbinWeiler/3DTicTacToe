@@ -1,12 +1,11 @@
 import { useState, useEffect, useContext } from 'react'
 import { createContext } from 'react'
 import GameBoard from './GameBoard'
-import { gameContext } from '../App'
-
-import { io } from 'socket.io-client';
-import "../../App.css"
+import { gameContext } from '../../App'
 import GameBoardUtils from '../../Utils/GameBoardUtils'
-import { useLocation } from 'react-router-dom';
+
+import "../../App.css"
+
 
 
 export const UpdateContext = createContext(null)
@@ -19,6 +18,7 @@ function GameUI({lobby}) {
   const {Socket, ClientID} = useContext(gameContext);
   const socket = Socket;
   const [clientID, setClientID] = ClientID
+  console.log(lobby);
 
   //http://localhost:5173/?id=111
 

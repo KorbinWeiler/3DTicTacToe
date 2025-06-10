@@ -16,7 +16,7 @@ const games = {
     gameID: "1",
     player1ID: 11,
     player2ID: 12,
-    board: null,
+    board: new GameBoardUtils(),
     yourTurn: true
   }
 }

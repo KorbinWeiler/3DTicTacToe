@@ -1,10 +1,8 @@
-import "../App.css"
 import { useState, useContext } from "react"
 import "../../App.css"
-import { useState, useEffect, useContext } from "react"
 import { UpdateContext } from "./GameUI";
 import { playerContext } from "./GameBoard";
-import { gameContext } from "../App";
+import { gameContext } from "../../App";
 
 export default function GameButton({x, y, z, Tile}){
 
