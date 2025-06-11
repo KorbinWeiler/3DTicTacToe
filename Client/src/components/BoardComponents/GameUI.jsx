@@ -30,6 +30,8 @@ function GameUI({lobby}) {
 
   const opponentID = ""
 
+  console.log(lobby)
+
   function winCheckRunner(){
 
     //Corners
@@ -87,8 +89,8 @@ function GameUI({lobby}) {
         isWin: win
       }
 
-      //socket.emit("sendPlay", opponentID, play)
-      socket.emit("test message", play)
+      socket.emit("sendPlay", opponentID, play)
+      //socket.emit("test message", play)
     }
   }, [update])
 
