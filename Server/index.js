@@ -18,12 +18,13 @@ const userConnections = {};
 function initLobbyStack(count){
   const tempStack = []
   for(let i = 0; i < count; ++i){
-    tempStack += i;
+    tempStack.push(i);
   }
   return tempStack;
 }
 
-const lobbyStack = initLobbyStack();
+const lobbyStack = initLobbyStack(10);
+console.log(lobbyStack)
 
 function getLobbyID(){
   return lobbyStack.pop();
@@ -38,20 +39,6 @@ io.on('connection', (socket) => {
   userConnections[userID] = socket.id;
   console.log(userConnections);
 
-  // // Join a room  might need to change this to reflect lobbies better
-  // socket.on('joinRoom', (roomName) => {
-  //   socket.join(roomName);
-  //   console.log(`Client ${socket.id} joined room ${roomName}`);
-  // });
-
-  // // Receive and broadcast message   might need to update this to send messages better
-  // socket.on('sendMessage', ({ room, message }) => {
-  //   io.to(room).emit('receiveMessage', {
-  //     from: socket.id,
-  //     text: message
-  //   });
-  // });
-
   socket.on('sendPlay', ({play, opponentID}) => {
     console.log(play)
     socket.to(userConnections[opponentID]).emit("recieve play", {
@@ -65,16 +52,27 @@ io.on('connection', (socket) => {
     })
   })
 
-  socket.on('acceptInvite', ({opponentID, hostID}) =>{
-    socket.to(userConnections[opponentID]).emit({
-      lobbyID: 1,
-      yourTurn: true,
-      board: null
-    })
-
+  socket.on('accept invitation', (opponentID, hostID) =>{
+    // socket.to(userConnections[opponentID]).emit({
+    //   lobbyID: 1,
+    //   yourTurn: true,
+    //   board: null
+    // })
+    console.log("accept invitation")
+    console.log(userConnections[opponentID])
     const lobby = getLobbyID();
-    socket.to(userConnections[hostID]).emit("add game", lobby, opponentID, hostID)
-    socket.to(userConnections[opponentID]).emit("add game", lobby, opponentID, hostID)
+    io.to(userConnections[hostID]).emit("add game", lobby, opponentID, hostID)
+    io.to(userConnections[opponentID]).emit("add game", lobby, opponentID, hostID)
+  
+  })
+
+  socket.on("test", (arg)=>{
+    console.log("SI")
+  })
+
+  socket.on("decline invitation", ({recieverID, invite})=>{
+    console.log("declined invitation")
+    socket.to(userConnections[invite]).emit("invitation declined", recieverID);
   })
 
   socket.on('disconnect', () => {

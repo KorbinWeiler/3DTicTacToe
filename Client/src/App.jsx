@@ -45,12 +45,15 @@ export default function App(){
       socket.auth = {clientID}
       socket.connect()
 
+      // socket.emit("test")
+
       socket.on("recieve play", ({play})=>{
         lobbies[play.lobbyID].board.setTile(play.x, play.y, play.z, play.val) //find a way to make this update the screen
       })
 
       //add socket end point to add game to the games list
       socket.on("add game", (gameID, player1, player2)=>{
+        console.log(gameID + " " + player1 + " " + player2)
         games[gameID] = {
           gameID: gameID,
           player1ID: player1,
@@ -59,6 +62,8 @@ export default function App(){
           yourTurn: clientID === player1,
           winner: null
         }
+
+        console.log(games)
       })
 
       //add endpoint to send an invite to someone
