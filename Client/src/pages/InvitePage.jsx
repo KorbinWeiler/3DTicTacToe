@@ -3,9 +3,11 @@ import InviteList from "../components/PageComponents/InviteList"
 
 export default function InvitePage(){
     return(
-        <>
+        <div className="uiBox">
             <Navbar></Navbar>
-            <InviteList></InviteList>
-        </>
+            <div className="invite-list space-invite border background-dark2">
+                <InviteList></InviteList>
+            </div>
+        </div>
     )
 }

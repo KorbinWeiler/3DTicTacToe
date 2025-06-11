@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { io } from 'socket.io-client';
 import {useEffect, useState, createContext} from "react"
 import GameBoardUtils from "./Utils/GameBoardUtils";
+import ChatLoginPage from "./pages/ChatLoginPage";
 
 const socket = io('http://localhost:3000', {autoConnect: false});
 
@@ -86,7 +87,7 @@ export default function App(){
         <Routes>
           <Route path="/" element={<TempGamePage/>}/>
           <Route path="/test" element={<GamePage/>}/>
-          <Route path="/Login" element={<LoginPage/>}/>
+          <Route path="/Login" element={<ChatLoginPage/>}/>
           <Route path="/Invites" element={<InvitePage/>}/>
         </Routes>
       </Router>

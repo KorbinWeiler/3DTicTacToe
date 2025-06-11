@@ -58,7 +58,7 @@ button{
   height: 100%;
   width: 100%;
   display:flex;
-  justify-content: space-between;
+  justify-content:space-between;
 }
 
 .game{
@@ -136,6 +136,7 @@ button{
 .navbar{
   width:100%;
   min-height: 3rem;
+  max-width: 3rem;
   background-color: #4a4a4a;
   justify-self: center;
   align-self: baseline;
@@ -188,4 +189,15 @@ button{
   margin: 5px;
   border:solid;
   border-radius: 5px;
+}
+
+/*Invite*/
+
+.invite-list{
+  width: 90%;
+}
+
+.space-invite{
+  display: flex;
+  justify-content: space-between;
 }
