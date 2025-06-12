@@ -46,10 +46,8 @@ io.on('connection', (socket) => {
     })
   })
 
-  socket.on('invite', ({opponentID, senderID}) => {
-    socket.to(userConnections[opponentID]).emit("game invite", {
-      senderID: senderID
-    })
+  socket.on('invite', (opponentID, senderID) => {
+    io.to(userConnections[opponentID]).emit("game invite", senderID)
   })
 
   socket.on('accept invitation', (opponentID, hostID) =>{

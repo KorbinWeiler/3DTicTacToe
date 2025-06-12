@@ -11,8 +11,6 @@ export default function InviteComponent({invite}){
         socket.emit("accept invitation", clientID, invite)
         console.log(clientID + " " + invite)
     }
-
-    console.log(socket)
     
     return(
         <div className="space-invite">

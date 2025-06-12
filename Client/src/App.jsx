@@ -4,13 +4,15 @@ import LoginPage from "./pages/LoginPage";
 import InvitePage from "./pages/InvitePage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { io } from 'socket.io-client';
-import {useEffect, useState, createContext} from "react"
+import {useEffect, useState, createContext, useRef} from "react"
 import GameBoardUtils from "./Utils/GameBoardUtils";
 import ChatLoginPage from "./pages/ChatLoginPage";
 
 const socket = io('http://localhost:3000', {autoConnect: false});
 
 export const gameContext = new createContext(null);
+
+export const inviteContext = new createContext(null);
 
 const games = {
   "1": {
@@ -37,11 +39,13 @@ export default function App(){
   */
 
   const[clientID, setClientID] = useState("")
-
+  const [invites, setInvites] = useState([])
 
   useEffect(()=>{
     if(clientID){
       console.log("hello " + clientID)
+      //userID = clientID;
+      sessionStorage.setItem("userID", clientID)
       socket.auth = {clientID}
       socket.connect()
 
@@ -49,6 +53,13 @@ export default function App(){
 
       socket.on("recieve play", ({play})=>{
         lobbies[play.lobbyID].board.setTile(play.x, play.y, play.z, play.val) //find a way to make this update the screen
+      })
+
+      socket.on("game invite", (senderID)=>{
+        console.log(senderID)
+        let temp = invites;
+        temp.push(senderID)
+        setInvites(temp);
       })
 
       //add socket end point to add game to the games list
@@ -83,20 +94,27 @@ export default function App(){
         console.log("Success");
       })
     }
+
+    const user = sessionStorage.getItem("userID")
+    if(user != null && clientID != user){
+      setClientID(user)
+    }
   }, [clientID])
   
   return(
     <>
+    <inviteContext.Provider value={{InviteList: [invites, setInvites]}}>
     <gameContext.Provider value={{Lobbies: games, ClientID: [clientID, setClientID], Socket: socket}}>
       <Router>
         <Routes>
           <Route path="/" element={<TempGamePage/>}/>
           <Route path="/test" element={<GamePage/>}/>
           <Route path="/Login" element={<ChatLoginPage/>}/>
-          <Route path="/Invites" element={<InvitePage/>}/>
+          <Route path="/Invites" element={<InvitePage invites={invites}/>}/>
         </Routes>
       </Router>
       </gameContext.Provider>
+      </inviteContext.Provider>
     </>
   )
 }
