@@ -56,10 +56,7 @@ export default function App(){
       })
 
       socket.on("game invite", (senderID)=>{
-        console.log(senderID)
-        let temp = invites;
-        temp.push(senderID)
-        setInvites(temp);
+        setInvites(prev=>([...prev, senderID]))
       })
 
       //add socket end point to add game to the games list
