@@ -10,7 +10,6 @@ export default function InvitePage({invites}){
     const socket = Socket
     let tempID = ''
     let opponent = ''
-    console.log(invites)
 
     return(
         <div className="uiBox">

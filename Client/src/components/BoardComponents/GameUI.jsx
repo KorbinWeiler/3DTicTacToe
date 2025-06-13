@@ -3,10 +3,9 @@ import { createContext } from 'react'
 import GameBoard from './GameBoard'
 import { gameContext } from '../../App'
 import GameBoardUtils from '../../Utils/GameBoardUtils'
+import { restoreBoardFunctionality } from '../../Utils/GameBoardUtils'
 
 import "../../App.css"
-
-
 
 export const UpdateContext = createContext(null)
 
@@ -18,8 +17,9 @@ function GameUI({lobby}) {
   const {Socket, ClientID} = useContext(gameContext);
   const socket = Socket;
   const [clientID, setClientID] = ClientID
-  console.log(lobby);
 
+  lobby.board = restoreBoardFunctionality(lobby.board)
+  //lobby.board = new GameBoardUtils() //cannot stay this way, need some way to maintain a consistent board
   //http://localhost:5173/?id=111
 
   const [winner, setWinner] = useState(false)
@@ -28,9 +28,7 @@ function GameUI({lobby}) {
   //   lobby.board = new GameBoardUtils()
   // }
 
-  const opponentID = ""
-
-  console.log(lobby)
+  const opponentID = lobby.player2ID
 
   function winCheckRunner(){
 
@@ -52,6 +50,8 @@ function GameUI({lobby}) {
       const playerVlaue = update[3];
       const lobbyID = update.substring(4)
       let win = false;
+
+      //lobby.board.checkWin is getting deleted because it is being converted to json and is losing the properties of the object
 
       //Can I put this in a loop somehow to make it look nicer
       win = win || lobby.board.checkWin(playerVlaue,0, 0, 0, 1, 1, 0); //down to the right same z
@@ -89,8 +89,7 @@ function GameUI({lobby}) {
         isWin: win
       }
 
-      socket.emit("sendPlay", opponentID, play)
-      //socket.emit("test message", play)
+      socket.emit("sendPlay", lobby.player2ID, JSON.stringify(play))
     }
   }, [update])
 

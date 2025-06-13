@@ -44,4 +44,68 @@ class GameBoardUtils{
     }
 }
 
+function restoreWinCheck(obj){
+    return {
+        ...obj,
+        winCheck(playerValue, x, y, z, xScale, yScale, zScale){
+            let count = 0;
+            while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
+                const tile = this.getTile(x, y, z);
+                if(tile.val === playerValue){
+                    count++;
+                }
+
+                x += 1 * xScale;
+                y += 1 * yScale;
+                z += 1 * zScale;
+            }
+            return count === 4;
+        }
+    }
+}
+
+function restoreGetTile(obj){
+    return{
+        ...obj,
+        getTile(x,y,z){
+            return this.boards[z].board[x][y]
+        }
+    }
+}
+
+function restoreSetTile(obj){
+    return{
+        ...obj,
+        setTile(x,y,z,newValue){
+            this.boards[z].board[x][y].val = newValue
+        }
+    }
+}
+
+export function restoreBoardFunctionality(obj){
+    return{
+        ...obj,
+        checkWin(playerValue, x, y, z, xScale, yScale, zScale){
+            let count = 0;
+            while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
+                const tile = this.getTile(x, y, z);
+                if(tile.val === playerValue){
+                    count++;
+                }
+
+                x += 1 * xScale;
+                y += 1 * yScale;
+                z += 1 * zScale;
+            }
+            return count === 4;
+        },
+        getTile(x,y,z){
+            return this.boards[z].board[x][y]
+        },
+        setTile(x,y,z,newValue){
+            this.boards[z].board[x][y].val = newValue
+        }
+    }
+}
+
 export default GameBoardUtils

@@ -9,7 +9,7 @@ export default function TempGamePage(){
     const [clientID, setClientID] = ClientID
     const currentLobbies = Lobbies;
 
-    const lobbyID = 1
+    const lobbyID = 9
 
     function fuckall(){
         console.log("idk man")

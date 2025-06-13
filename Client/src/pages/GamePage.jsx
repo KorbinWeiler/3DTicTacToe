@@ -17,7 +17,7 @@ export default function GamePage({socket}){
     const [clientID, setClientID] = ClientID
     const currentLobbies = Lobbies;
 
-    const [lobbyID, setLobbyID] = useState("1")
+    const [lobbyID, setLobbyID] = useState("9")
 
     //temporary states for testing
     const [tempPlayerID, setTempPlayerID] = useState('');

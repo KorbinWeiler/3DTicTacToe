@@ -7,6 +7,7 @@ import { io } from 'socket.io-client';
 import {useEffect, useState, createContext, useRef} from "react"
 import GameBoardUtils from "./Utils/GameBoardUtils";
 import ChatLoginPage from "./pages/ChatLoginPage";
+import { restoreBoardFunctionality } from "./Utils/GameBoardUtils";
 
 const socket = io('http://localhost:3000', {autoConnect: false});
 
@@ -14,15 +15,7 @@ export const gameContext = new createContext(null);
 
 export const inviteContext = new createContext(null);
 
-const games = {
-  "1": {
-    gameID: "1",
-    player1ID: 11,
-    player2ID: 12,
-    board: new GameBoardUtils(),
-    yourTurn: true
-  }
-}
+const games = JSON.parse(sessionStorage.getItem("ongoing games")) || {}
 
 export default function App(){
 
@@ -40,7 +33,8 @@ export default function App(){
 
   const[clientID, setClientID] = useState("")
   const [invites, setInvites] = useState([])
-
+  const [count, setCount] = useState(0)
+  
   useEffect(()=>{
     if(clientID){
       console.log("hello " + clientID)
@@ -51,12 +45,19 @@ export default function App(){
 
       // socket.emit("test")
 
-      socket.on("recieve play", ({play})=>{
-        lobbies[play.lobbyID].board.setTile(play.x, play.y, play.z, play.val) //find a way to make this update the screen
+      socket.on("recieve play", (play)=>{
+        const vals = JSON.parse(play.opponentPlay)
+        games[vals.lobbyID].board = restoreBoardFunctionality(games[vals.lobbyID].board)
+        //once again running into the issue where this board doesn't have values
+        games[vals.lobbyID].board.setTile(vals.x, vals.y, vals.z, vals.val) //find a way to make this update the screen
+        games[vals.lobbyID].yourTurn = true;
+        setCount(t=>t +1)
+        //sessionStorage.setItem('ongoing games', JSON.stringify(games))
       })
 
       socket.on("game invite", (senderID)=>{
         setInvites(prev=>([...prev, senderID]))
+        sessionStorage.setItem("invites", invites)//make sure to clear this and reload whenever the user ID changes
       })
 
       //add socket end point to add game to the games list
@@ -70,7 +71,7 @@ export default function App(){
           yourTurn: clientID === player1,
           winner: null
         }
-
+        sessionStorage.setItem('ongoing games', JSON.stringify(games))
         console.log(games)
       })
 
@@ -96,6 +97,11 @@ export default function App(){
     if(user != null && clientID != user){
       setClientID(user)
     }
+
+    // const gameList= sessionStorage.getItem("ongoing games")
+    // if(gameList){
+    //   games = gameList
+    // }
   }, [clientID])
   
   return(

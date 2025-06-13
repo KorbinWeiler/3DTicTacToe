@@ -22,13 +22,21 @@ export default function GameButton({x, y, z, Tile}){
 
     const stylePresets = "default square"
 
+    if(Tile.val != " "){
+        console.log("SOmethinga")
+    }
+    if(Tile.val != " " && style === "default"){
+        console.log("BOZO")
+        Tile.val === "X" ? setStyle("light") : setStyle("dark");
+    }
+
     function updateTile(){
         if(Tile.val === " " || style === "default"){
             player ? setStyle("light") : setStyle("dark");
             player ? Tile.val = "X" : Tile.val="O"; //maybe rework once playerIDs are being used
             setPlayer(!player); //remove once multiplayer is implemented
 
-            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '1') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '1')
+            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '9') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '9')
         }       
     }
 
