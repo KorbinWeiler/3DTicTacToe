@@ -51,8 +51,8 @@ export default function App(){
         //once again running into the issue where this board doesn't have values
         games[vals.lobbyID].board.setTile(vals.x, vals.y, vals.z, vals.val) //find a way to make this update the screen
         games[vals.lobbyID].yourTurn = true;
+        sessionStorage.setItem('ongoing games', JSON.stringify(games))
         setCount(t=>t +1)
-        //sessionStorage.setItem('ongoing games', JSON.stringify(games))
       })
 
       socket.on("game invite", (senderID)=>{

@@ -28,7 +28,7 @@ function GameUI({lobby}) {
   //   lobby.board = new GameBoardUtils()
   // }
 
-  const opponentID = lobby.player2ID
+  const opponentID = lobby.player1ID === clientID ? lobby.player2ID : lobby.player1ID
 
   function winCheckRunner(){
 
@@ -89,7 +89,7 @@ function GameUI({lobby}) {
         isWin: win
       }
 
-      socket.emit("sendPlay", lobby.player2ID, JSON.stringify(play))
+      socket.emit("sendPlay", opponentID, JSON.stringify(play)) //is not caching on the sending players side. This leads to resets clearing their most recent play
     }
   }, [update])
 

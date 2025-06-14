@@ -10,7 +10,7 @@ export default function GameButton({x, y, z, Tile}){
     const [style, setStyle] = useState("default");
     
     const {updates} = useContext(UpdateContext)
-    const {players} = useContext(playerContext)
+    const {players} = useContext(playerContext) //is this still a thing?
     const {ClientID} = useContext(gameContext) 
 
     const [clientID, setClientID] = ClientID
@@ -34,8 +34,9 @@ export default function GameButton({x, y, z, Tile}){
         if(Tile.val === " " || style === "default"){
             player ? setStyle("light") : setStyle("dark");
             player ? Tile.val = "X" : Tile.val="O"; //maybe rework once playerIDs are being used
-            setPlayer(!player); //remove once multiplayer is implemented
+            setPlayer(!player); //Remove this now and create a persistent player value based on if they are player 1 or player 2
 
+            //add a way to designate gameID
             player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '9') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '9')
         }       
     }
