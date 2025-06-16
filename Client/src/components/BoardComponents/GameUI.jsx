@@ -23,7 +23,8 @@ function GameUI({lobby}) {
   //lobby.board = new GameBoardUtils() //cannot stay this way, need some way to maintain a consistent board
   //http://localhost:5173/?id=111
 
-  const [winner, setWinner] = useState(!(lobby.winner === null))
+  // const [winner, setWinner] = useState(!(lobby.winner === null))
+  let winner = !(lobby.winner === null)
 
   // if(lobby.board){
   //   lobby.board = new GameBoardUtils()
@@ -71,13 +72,14 @@ function GameUI({lobby}) {
 
       win = win || lobby.board.checkWin(playerVlaue,x, y, 0, 0, 0, 1);
 
-      setWinner(win);
+      // setWinner(win);
+      winner = win
       return win;
     }
   }
 
   useEffect(()=>{
-    const win = winCheckRunner()
+    // const win = winCheckRunner()
     if(lobby.yourTurn && update){
       const win = winCheckRunner()
       //lobbies[lobbyID].yourTurn = false;
@@ -88,7 +90,8 @@ function GameUI({lobby}) {
         z: update[2],
         val: update[3],
         lobbyID: update.substring(4),
-        isWin: win
+        isWin: win,
+        playedBy: clientID
       }
       lobby.yourTurn = false;
       socket.emit("sendPlay", opponentID, clientID, JSON.stringify(play)) //is not caching on the sending players side. This leads to resets clearing their most recent play
@@ -103,7 +106,8 @@ function GameUI({lobby}) {
       <p>{opponentID ? opponentID : "No Opponent"}</p>
       <PlayerStateContext.Provider value={{playerValue: isPLayer1, yourTurn: lobby.yourTurn}}>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobby.board} />}
+        {winner ? <h1>Winner: {lobby.winner}</h1> : null}
+        <GameBoard BackendGameBoard={lobby.board} />
       </UpdateContext.Provider>
       </PlayerStateContext.Provider>
     </>

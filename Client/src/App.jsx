@@ -34,7 +34,7 @@ export default function App(){
   const[clientID, setClientID] = useState("")
   const [invites, setInvites] = useState([])
   const [count, setCount] = useState(0)
-  
+
   useEffect(()=>{
     if(clientID){
       console.log("hello " + clientID)
@@ -52,7 +52,9 @@ export default function App(){
         games[vals.lobbyID].board.setTile(vals.x, vals.y, vals.z, vals.val) //find a way to make this update the screen
         games[vals.lobbyID].yourTurn = true;
         if(vals.isWin === true){
-          clientID === games[vals.lobbyID].player1ID ? games[vals.lobbyID].winner = games[vals.lobbyID].player2ID : games[vals.lobbyID].winner = clientID
+          games[vals.lobbyID].winner = vals.playedBy;
+          // clientID === games[vals.lobbyID].player1ID ? games[vals.lobbyID].winner = games[vals.lobbyID].player2ID : games[vals.lobbyID].winner = clientID
+          games[vals.lobbyID].yourTurn = false;
           console.log(games[vals.lobbyID].winner)
         }
         sessionStorage.setItem('ongoing games', JSON.stringify(games))
@@ -66,7 +68,10 @@ export default function App(){
         //games[vals.lobbyID].board.setTile(vals.x, vals.y, vals.z, vals.val) //find a way to make this update the screen
         games[vals.lobbyID].yourTurn = false;
         if(vals.isWin === true){
-          clientID === games[vals.lobbyID].player1ID ? games[vals.lobbyID].winner = clientID : games[vals.lobbyID].winner = games[vals.lobbyID].player2ID
+          games[vals.lobbyID].winner = vals.playedBy;
+          // clientID === games[vals.lobbyID].player1ID ? games[vals.lobbyID].winner = clientID : games[vals.lobbyID].winner = games[vals.lobbyID].player2ID
+          games[vals.lobbyID].yourTurn = false;
+          console.log(games[vals.lobbyID].winner)
         }
         sessionStorage.setItem('ongoing games', JSON.stringify(games))
         setCount(t=>t +1)
