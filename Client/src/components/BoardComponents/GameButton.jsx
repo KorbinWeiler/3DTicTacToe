@@ -1,8 +1,8 @@
 import { useState, useContext } from "react"
 import "../../App.css"
 import { UpdateContext } from "./GameUI";
-import { playerContext } from "./GameBoard";
 import { gameContext } from "../../App";
+import { PlayerStateContext } from "./GameUI";
 
 export default function GameButton({x, y, z, Tile}){
 
@@ -10,34 +10,28 @@ export default function GameButton({x, y, z, Tile}){
     const [style, setStyle] = useState("default");
     
     const {updates} = useContext(UpdateContext)
-    const {players} = useContext(playerContext) //is this still a thing?
+    const {playerValue, yourTurn} = useContext(PlayerStateContext) //is this still a thing?
     const {ClientID} = useContext(gameContext) 
 
     const [clientID, setClientID] = ClientID
 
     //would it be easier just to pass a player value?
     const [update, forceUpdate] = updates;
-    const [player, setPlayer] = players
+    //let turn = yourTurn
 
 
     const stylePresets = "default square"
 
-    if(Tile.val != " "){
-        console.log("SOmethinga")
-    }
     if(Tile.val != " " && style === "default"){
-        console.log("BOZO")
         Tile.val === "X" ? setStyle("light") : setStyle("dark");
     }
 
     function updateTile(){
-        if(Tile.val === " " || style === "default"){
-            player ? setStyle("light") : setStyle("dark");
-            player ? Tile.val = "X" : Tile.val="O"; //maybe rework once playerIDs are being used
-            setPlayer(!player); //Remove this now and create a persistent player value based on if they are player 1 or player 2
+        if((Tile.val === " " || style === "default") && yourTurn){
+            playerValue ? setStyle("light") : setStyle("dark");
+            playerValue ? Tile.val = "X" : Tile.val="O"; //maybe rework once playerValueIDs are being used
 
-            //add a way to designate gameID
-            player ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '9') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '9')
+            playerValue ? forceUpdate(x.toString() + y.toString() + z.toString() + 'X' + '9') : forceUpdate(x.toString() + y.toString() + z.toString() + 'O' + '9')
         }       
     }
 

@@ -39,13 +39,16 @@ io.on('connection', (socket) => {
   userConnections[userID] = socket.id;
   console.log(userConnections);
 
-  socket.on('sendPlay', (opponentID, play) => {
+  socket.on('sendPlay', (opponentID, senderID, play) => {
     console.log("Play: " + play)
     console.log("ID: " + opponentID)
+    //send the play back to the player again
+    io.to(userConnections[senderID]).emit("replay play", play)
     socket.to(userConnections[opponentID]).emit("recieve play", {
       opponentPlay: play
     })
   })
+
 
   socket.on('invite', (opponentID, senderID) => {
     io.to(userConnections[opponentID]).emit("game invite", senderID)

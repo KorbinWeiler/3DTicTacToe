@@ -8,6 +8,7 @@ import { restoreBoardFunctionality } from '../../Utils/GameBoardUtils'
 import "../../App.css"
 
 export const UpdateContext = createContext(null)
+export const PlayerStateContext = createContext(null)
 
 function GameUI({lobby}) {
   
@@ -22,7 +23,7 @@ function GameUI({lobby}) {
   //lobby.board = new GameBoardUtils() //cannot stay this way, need some way to maintain a consistent board
   //http://localhost:5173/?id=111
 
-  const [winner, setWinner] = useState(false)
+  const [winner, setWinner] = useState(!(lobby.winner === null))
 
   // if(lobby.board){
   //   lobby.board = new GameBoardUtils()
@@ -76,6 +77,7 @@ function GameUI({lobby}) {
   }
 
   useEffect(()=>{
+    const win = winCheckRunner()
     if(lobby.yourTurn && update){
       const win = winCheckRunner()
       //lobbies[lobbyID].yourTurn = false;
@@ -88,18 +90,22 @@ function GameUI({lobby}) {
         lobbyID: update.substring(4),
         isWin: win
       }
-
-      socket.emit("sendPlay", opponentID, JSON.stringify(play)) //is not caching on the sending players side. This leads to resets clearing their most recent play
+      lobby.yourTurn = false;
+      socket.emit("sendPlay", opponentID, clientID, JSON.stringify(play)) //is not caching on the sending players side. This leads to resets clearing their most recent play
     }
   }, [update])
+
+  const isPLayer1 = lobby.player1ID === clientID
 
   return (
     <>
       <p>{clientID ?  clientID : "no Player ID"}</p>
       <p>{opponentID ? opponentID : "No Opponent"}</p>
+      <PlayerStateContext.Provider value={{playerValue: isPLayer1, yourTurn: lobby.yourTurn}}>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobby.board}/>}
+        {winner ? <h1>Winnner</h1> : <GameBoard BackendGameBoard={lobby.board} />}
       </UpdateContext.Provider>
+      </PlayerStateContext.Provider>
     </>
   )
 }

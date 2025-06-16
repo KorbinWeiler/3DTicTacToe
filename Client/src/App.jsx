@@ -51,6 +51,23 @@ export default function App(){
         //once again running into the issue where this board doesn't have values
         games[vals.lobbyID].board.setTile(vals.x, vals.y, vals.z, vals.val) //find a way to make this update the screen
         games[vals.lobbyID].yourTurn = true;
+        if(vals.isWin === true){
+          clientID === games[vals.lobbyID].player1ID ? games[vals.lobbyID].winner = games[vals.lobbyID].player2ID : games[vals.lobbyID].winner = clientID
+          console.log(games[vals.lobbyID].winner)
+        }
+        sessionStorage.setItem('ongoing games', JSON.stringify(games))
+        setCount(t=>t +1)
+      })
+
+      socket.on("replay play", (play)=>{
+        const vals = JSON.parse(play)
+        //games[vals.lobbyID].board = restoreBoardFunctionality(games[vals.lobbyID].board)
+        //once again running into the issue where this board doesn't have values
+        //games[vals.lobbyID].board.setTile(vals.x, vals.y, vals.z, vals.val) //find a way to make this update the screen
+        games[vals.lobbyID].yourTurn = false;
+        if(vals.isWin === true){
+          clientID === games[vals.lobbyID].player1ID ? games[vals.lobbyID].winner = clientID : games[vals.lobbyID].winner = games[vals.lobbyID].player2ID
+        }
         sessionStorage.setItem('ongoing games', JSON.stringify(games))
         setCount(t=>t +1)
       })
