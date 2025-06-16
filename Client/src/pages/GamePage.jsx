@@ -59,7 +59,7 @@ export default function GamePage({socket}){
     return(
         <div className="uiBox">
             <div className="sidebar navigation background-dark2 border border-thin">
-            <Sidebar content={<Navbar/>}></Sidebar>
+            <Navbar></Navbar>
             </div>
             <div className="content-box">
                 <div className="game border border-thin background-dark2">

@@ -12,9 +12,9 @@ export default function InvitePage({invites}){
     let opponent = ''
 
     return(
-        <div className="uiBox">
+        <div>
             <Navbar></Navbar>
-            <form>
+            {/* <form>
                 <input className="border background-dark2" type="text" onChange={(e)=>{tempID = e.target.value}} placeholder="userID"></input>
                 <button type="button" onClick={()=>{setClientID(tempID)}}>change</button>
             </form>
@@ -22,9 +22,12 @@ export default function InvitePage({invites}){
             <form>
                 <input className="border background-dark2" type="text" onChange={(e)=>{opponent = e.target.value}} placeholder="OpponentID"></input>
                 <button type="button" onClick={()=>{socket.emit("invite", opponent, clientID)}}>Send Invite</button>
-            </form>
-            <div className="invite-list space-invite border background-dark2">
-                <InviteList invites={invites}></InviteList>
+            </form> */}
+            <div className="box">
+                <div className="invite-box">
+                    <InviteList invites={invites}></InviteList>
+                </div>
+                <button className="button invite-button" type="button">Send Invite</button>
             </div>
         </div>
     )

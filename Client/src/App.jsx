@@ -15,7 +15,7 @@ export const gameContext = new createContext(null);
 
 export const inviteContext = new createContext(null);
 
-const games = JSON.parse(sessionStorage.getItem("ongoing games")) || {}
+const games = JSON.parse(sessionStorage.getItem("ongoing games")) || {"9": {board: new GameBoardUtils()}}
 
 export default function App(){
 

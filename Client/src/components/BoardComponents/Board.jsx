@@ -12,7 +12,7 @@ export default function Board({z, BackendBoard}){
 
     return (
         <>
-            <div className="grid grid-cols-4 board">
+            <div className="board-grid board">
 
                 {/* {boardButtons} */}
 

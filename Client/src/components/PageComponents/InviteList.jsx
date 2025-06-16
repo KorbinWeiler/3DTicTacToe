@@ -15,7 +15,7 @@ export default function InviteList({invites}){
 
     return(
     <div>
-        {invites != [] ? invites.map((invite, e)=>(<InviteComponent key={e} invite={invite} />)) : null}
+        {invites != [] ? <p>No Invites</p> : invites.map((invite, e)=>(<InviteComponent key={e} invite={invite} />))}
     </div>
     )
 }
