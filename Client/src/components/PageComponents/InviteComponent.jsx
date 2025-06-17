@@ -13,10 +13,12 @@ export default function InviteComponent({invite}){
     }
     
     return(
-        <div className="space-invite">
+        <div className="card invite">
             {invite}
-            <button type="button" onClick={accept}>Accept</button>
-            <button type="button" onClick={()=>{socket.emit("decline invitation", clientID, invite)}}>Decline</button>
+            <div>
+            <button className="button temp" type="button" onClick={accept}>Accept</button>
+            <button className="button temp" type="button" onClick={()=>{socket.emit("decline invitation", clientID, invite)}}>Decline</button>
+            </div>
         </div>
     )
 }

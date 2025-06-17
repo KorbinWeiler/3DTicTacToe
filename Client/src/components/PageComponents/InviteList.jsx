@@ -9,13 +9,9 @@ export default function InviteList({invites}){
     //const [invites, setInvites] = InviteList;
     //const invite = invites.map((invite)=>(<InviteComponent invite={invite}/>))
 
-    useEffect(()=>{
-
-    }, [invites])
-
     return(
-    <div>
-        {invites != [] ? <p>No Invites</p> : invites.map((invite, e)=>(<InviteComponent key={e} invite={invite} />))}
+    <div className="list">
+        {invites.length === 0 ? <p>No Invites</p> : invites.map((invite, e)=>(<InviteComponent key={e} invite={invite} />))}
     </div>
     )
 }

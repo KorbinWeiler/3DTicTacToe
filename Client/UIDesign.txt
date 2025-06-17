@@ -8,6 +8,16 @@
 | Border         | `#2C2C2C` | Divider/border elements    |
 | Error          | `#EF5350` | Error states               |
 
+game colors?:
+#26B693
+--- #00ff9a
+#0072ff
+--- #AA13D4
+#ff00e7
+#ff0000
+#ff7700
+#ffff00
+
 body {
   font-family: 'Inter', 'Segoe UI', sans-serif;
   font-size: 16px;
