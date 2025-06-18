@@ -120,6 +120,69 @@ body {
   margin-bottom: 1rem;
 }
 
+.box-format{
+  display:flex;
+  border-style: solid;
+  border-color:#2C2C2C;
+  border-radius: 10px;
+  justify-content: center;
+}
+
+.game{
+  display: flex;
+  flex-direction: column;
+  min-width: 10vw;
+  height: 33%;
+  justify-items: center;
+  margin: 4px;
+}
+
+.game:hover{
+  color:#00BCD4;
+}
+
+.game-box{
+  height: 80vh;
+  overflow: auto;
+}
+
+.games-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-auto-rows: minmax(4rem, 10rem);
+  height: auto;
+}
+
+form{
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+}
+
+.login{
+  min-width: 20vw;
+  min-height: 20vh;
+  width: auto;
+  height: auto;
+  align-items: center;
+}
+
+.login-button{
+  margin-bottom: 5px;
+}
+
+.text-input{
+  margin: 3px;
+  width: 90%;
+  border-style: solid;
+  border-radius: 5px;
+  border-color:#2C2C2C;
+  background-color: #1E1E1E;
+  color: white;
+  padding: .5rem;
+}
+
 .invite{
   width: 90%;
   display: flex;
@@ -135,6 +198,14 @@ body {
   justify-items: center;
 }
 
+.error{
+  color:#EF5350;
+  font-style: italic;
+  padding: 0px;
+  margin: 2px;
+  font-size: small;
+}
+
 .modal{
   width: 30%;
   height: 30%;
@@ -146,10 +217,11 @@ body {
 
 .card {
   background-color: #1E1E1E;
+  min-height: 6rem;
   padding: 1.5rem;
   border-radius: 8px;
   border: 1px solid #2C2C2C;
-  box-shadow: 0 4px 8px rgba(0 188 212, 0);
+  /* box-shadow: 0 4px 8px rgba(0 188 212, 0); */
 }
 
 

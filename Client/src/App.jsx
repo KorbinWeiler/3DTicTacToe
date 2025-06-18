@@ -8,6 +8,7 @@ import {useEffect, useState, createContext, useRef} from "react"
 import GameBoardUtils from "./Utils/GameBoardUtils";
 import ChatLoginPage from "./pages/ChatLoginPage";
 import { restoreBoardFunctionality } from "./Utils/GameBoardUtils";
+import UserGamesPage from "./pages/UserGamesPage";
 
 const socket = io('http://localhost:3000', {autoConnect: false});
 
@@ -134,8 +135,9 @@ export default function App(){
         <Routes>
           <Route path="/" element={<TempGamePage/>}/>
           <Route path="/test" element={<GamePage/>}/>
-          <Route path="/Login" element={<ChatLoginPage/>}/>
+          <Route path="/Login" element={<LoginPage/>}/>
           <Route path="/Invites" element={<InvitePage invites={invites}/>}/>
+          <Route path="/Games" element={<UserGamesPage/>}/>
         </Routes>
       </Router>
       </gameContext.Provider>
