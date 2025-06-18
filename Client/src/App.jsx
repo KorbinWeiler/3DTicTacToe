@@ -34,6 +34,7 @@ export default function App(){
 
   const[clientID, setClientID] = useState("")
   const [invites, setInvites] = useState([])
+  const [currentLobby, setCurrentLobby] = useState("")
   const [count, setCount] = useState(0)
 
   useEffect(()=>{
@@ -130,7 +131,7 @@ export default function App(){
   return(
     <>
     <inviteContext.Provider value={{InviteList: [invites, setInvites]}}>
-    <gameContext.Provider value={{Lobbies: games, ClientID: [clientID, setClientID], Socket: socket}}>
+    <gameContext.Provider value={{CurrentLobby: [currentLobby, setCurrentLobby], Lobbies: games, ClientID: [clientID, setClientID], Socket: socket}}>
       <Router>
         <Routes>
           <Route path="/" element={<TempGamePage/>}/>

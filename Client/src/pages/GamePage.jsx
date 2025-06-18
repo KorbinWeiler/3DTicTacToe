@@ -13,11 +13,10 @@ export default function GamePage({socket}){
     //IDK if either of these points are necessary in this page (Maybe for displaying details)
     const [opponentID, setOpponentID] = useState('');
 
-    const {Lobbies, ClientID} = useContext(gameContext)
+    const {CurrentLobby, Lobbies, ClientID} = useContext(gameContext)
     const [clientID, setClientID] = ClientID
+    const [currentLobby, setCurrentLobby] = CurrentLobby
     const currentLobbies = Lobbies;
-
-    const [lobbyID, setLobbyID] = useState("9")
 
     //temporary states for testing
     const [tempPlayerID, setTempPlayerID] = useState('');
@@ -50,7 +49,7 @@ export default function GamePage({socket}){
 //                 </form>
 //             </div>
 //             <div>
-//                 <GameUI lobby={currentLobbies[lobbyID]}/>
+//                 <GameUI lobby={currentLobbies[currentLobby]}/>
 //             </div>
 //         </div>
 //     )
@@ -63,7 +62,7 @@ export default function GamePage({socket}){
             </div>
             <div className="content-box">
                 <div className="game border border-thin background-dark2">
-                    <GameUI lobby={currentLobbies[lobbyID]}/>
+                    <GameUI lobby={currentLobbies[currentLobby]}/>
                 </div>
             </div>
             <div  className="sidebar play-stats background-dark2 border border-thin">
