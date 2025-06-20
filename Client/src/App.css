@@ -137,10 +137,6 @@ body {
   margin: 4px;
 }
 
-.game:hover{
-  color:#00BCD4;
-}
-
 .game-box{
   height: 80vh;
   overflow: auto;
@@ -189,6 +185,30 @@ form{
   justify-content: space-between;
 }
 
+.user-board{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height:60vh;
+  width: 30vw;
+}
+
+.game-stats{
+  align-content: center;
+  text-align: center;
+  padding-right: 2rem;
+  position:static;
+  left:auto
+}
+
+.content-box{
+  overflow: hidden;
+  border-style: solid;
+  border-radius: 10px;
+  border-color:#B3B3B3;
+  background-color: #2C2C2C;
+}
+
 .temp{
   margin-left: 5px;
   margin-right: 5px;
@@ -213,6 +233,15 @@ form{
   position: fixed;
   border-radius: 10px;
   justify-items: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-alignment{
+  padding: 16%;
+  justify-items: center;
+  align-items: center;
 }
 
 .card {

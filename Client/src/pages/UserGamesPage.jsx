@@ -37,6 +37,81 @@ export default function UserGamesPage(){
         6:{
             player1ID: 7,
             player2ID: 8,
+            yourTurn: true,
+        },
+        7:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        8:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        9:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        10:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        11:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        12:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        13:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        14:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        15:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        16:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        17:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        18:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        19:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        20:{
+            player1ID: 7,
+            player2ID: 8,
+            yourTurn: true
+        },
+        21:{
+            player1ID: 7,
+            player2ID: 8,
             yourTurn: true
         }
     }

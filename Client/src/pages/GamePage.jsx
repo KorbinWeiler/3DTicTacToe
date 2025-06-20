@@ -18,6 +18,8 @@ export default function GamePage({socket}){
     const [currentLobby, setCurrentLobby] = CurrentLobby
     const currentLobbies = Lobbies;
 
+    const temp = 9;
+
     //temporary states for testing
     const [tempPlayerID, setTempPlayerID] = useState('');
     const [tempOpponentID, setTempOpponentID] = useState('');
@@ -57,16 +59,12 @@ export default function GamePage({socket}){
 
     return(
         <div className="uiBox">
-            <div className="sidebar navigation background-dark2 border border-thin">
             <Navbar></Navbar>
-            </div>
             <div className="content-box">
-                <div className="game border border-thin background-dark2">
-                    <GameUI lobby={currentLobbies[currentLobby]}/>
+                <div className="game">
+                    {/* <GameUI lobby={currentLobbies[currentLobby]}/> */}
+                    <GameUI lobby={currentLobbies[temp]}/>
                 </div>
-            </div>
-            <div  className="sidebar play-stats background-dark2 border border-thin">
-            <Sidebar></Sidebar>
             </div>
         </div>
     )

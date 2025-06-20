@@ -67,8 +67,8 @@ export default function InvitePage({invites}){
                 className={"modal"}
                 contentLabel="Invite Modal">
                     
-                    <form>
-                        <input className="" type="text" placeholder="Opponent Username" onChange={(e)=>{tempOpponentID = e}}></input>
+                    <form className="modal-alignment">
+                        <input className="text-input" type="text" placeholder="Opponent Username" onChange={(e)=>{tempOpponentID = e}}></input>
                         <button className="button" type="button" onClick={()=>{socket.emit("invite", tempOpponentID, clientID)}}>Send Invite</button>
                     </form>
                 </Modal>

@@ -101,16 +101,20 @@ function GameUI({lobby}) {
   const isPLayer1 = lobby.player1ID === clientID
 
   return (
-    <>
+    <div className='user-board'>
+      <div className='game-stats'>
       <p>{clientID ?  clientID : "no Player ID"}</p>
       <p>{opponentID ? opponentID : "No Opponent"}</p>
+      {winner ? <h1>Winner: {lobby.winner}</h1> : null}
+      </div>
+      <div>
       <PlayerStateContext.Provider value={{playerValue: isPLayer1, yourTurn: lobby.yourTurn}}>
       <UpdateContext.Provider value={{updates: [update, forceUpdate]}}>
-        {winner ? <h1>Winner: {lobby.winner}</h1> : null}
         <GameBoard BackendGameBoard={lobby.board} />
       </UpdateContext.Provider>
       </PlayerStateContext.Provider>
-    </>
+      </div>
+    </div>
   )
 }
 

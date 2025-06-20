@@ -134,8 +134,10 @@ export default function App(){
     <gameContext.Provider value={{CurrentLobby: [currentLobby, setCurrentLobby], Lobbies: games, ClientID: [clientID, setClientID], Socket: socket}}>
       <Router>
         <Routes>
-          <Route path="/" element={<TempGamePage/>}/>
-          <Route path="/test" element={<GamePage/>}/>
+          <Route path="/" element={<GamePage/>}/>
+          <Route path="/help" element={<GamePage/>}/>
+          <Route path="/Profile" element={<GamePage/>}/>
+          <Route path="/Game" element={<GamePage/>}/>
           <Route path="/Login" element={<LoginPage/>}/>
           <Route path="/Invites" element={<InvitePage invites={invites}/>}/>
           <Route path="/Games" element={<UserGamesPage/>}/>
