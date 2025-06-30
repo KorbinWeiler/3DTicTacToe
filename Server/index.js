@@ -54,6 +54,15 @@ io.on('connection', (socket) => {
     io.to(userConnections[opponentID]).emit("game invite", senderID)
   })
 
+  socket.on("request users", ()=>{
+    const activeUser = []
+    for (let key in userConnections){
+      if (userConnections.hasOwnProperty(key)) {
+            activeUser.push(key)
+        }
+    }
+  })
+
   socket.on('accept invitation', (opponentID, hostID) =>{
     // socket.to(userConnections[opponentID]).emit({
     //   lobbyID: 1,
