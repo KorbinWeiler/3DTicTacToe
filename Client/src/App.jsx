@@ -1,14 +1,15 @@
-import TempGamePage from "./pages/TempGamePage";
 import GamePage from "./pages/GamePage";
 import LoginPage from "./pages/LoginPage";
 import InvitePage from "./pages/InvitePage";
+import HomePage from "./pages/HomePage";
+import UserGamesPage from "./pages/UserGamesPage";
+import GameBoardUtils from "./Utils/GameBoardUtils";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { io } from 'socket.io-client';
-import {useEffect, useState, createContext, useRef} from "react"
-import GameBoardUtils from "./Utils/GameBoardUtils";
-import ChatLoginPage from "./pages/ChatLoginPage";
+import {useEffect, useState, createContext} from "react"
 import { restoreBoardFunctionality } from "./Utils/GameBoardUtils";
-import UserGamesPage from "./pages/UserGamesPage";
+import { useNavigate } from "react-router-dom";
+
 
 const socket = io('http://localhost:3000', {autoConnect: false});
 
@@ -127,6 +128,11 @@ export default function App(){
     //   games = gameList
     // }
   }, [clientID])
+
+  // const navigate = useNavigate()
+  // if (!clientID){
+  //   navigate("/Login")
+  // }
   
   return(
     <>
@@ -134,7 +140,7 @@ export default function App(){
     <gameContext.Provider value={{CurrentLobby: [currentLobby, setCurrentLobby], Lobbies: games, ClientID: [clientID, setClientID], Socket: socket}}>
       <Router>
         <Routes>
-          <Route path="/" element={<GamePage/>}/>
+          <Route path="/" element={<HomePage/>}/>
           <Route path="/help" element={<GamePage/>}/>
           <Route path="/Profile" element={<GamePage/>}/>
           <Route path="/Game" element={<GamePage/>}/>

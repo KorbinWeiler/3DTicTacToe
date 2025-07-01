@@ -13,9 +13,9 @@ export default function Navbar(){
             <nav>
                 <a href="/">Home</a>
                 <a href="/invites">Game Invites</a>
-                <a href="/">Games</a>
+                <a href="/Games">Games</a>
                 <a href="/">Profile</a>
-                {clientID ? <button>Sign Out</button> : <button>Login</button>}                
+                {clientID ? <button onClick={()=>{setClientID("")}}>Sign Out</button> : <button>Login</button>}                
             </nav>
             <SidebarIcon destinationLink={"/Login"}/>
         </div>

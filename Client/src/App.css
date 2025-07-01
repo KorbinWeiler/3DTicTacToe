@@ -226,6 +226,10 @@ form{
   font-size: small;
 }
 
+.jello{
+  color: pink;
+}
+
 .modal{
   width: 30%;
   height: 30%;
