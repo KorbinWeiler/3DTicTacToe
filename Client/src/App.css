@@ -31,11 +31,18 @@ body {
   cursor: not-allowed;
 }
 
+.nav-login{
+  /* position: sticky; */
+  position: fixed;
+  bottom: 5%;
+  width: 11.5%;
+}
+
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 180px;
+  width: 12%;
   height: 100vh;
   background-color: #1E1E1E;
   border-right: 1px solid #2C2C2C;
@@ -226,8 +233,43 @@ form{
   font-size: small;
 }
 
-.jello{
-  color: pink;
+.main-page-invite-button{
+  margin: 2px;
+  background-color: #00BCD4;
+  color: white;
+  text-align: center;
+}
+
+.plus-sign {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.plus-sign::before,
+.plus-sign::after {
+  content: '';
+  position: absolute;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.plus-sign::before {
+  width: 10%;
+  height: 60%;
+  left: 45%;
+  transform: translateY(-50%);
+}
+
+.plus-sign::after {
+  width: 60%;
+  height: 10%;
+  top: 45%;
+  transform: translateX(-50%);
+}
+
+.playerText{
+  font-size: auto;
 }
 
 .modal{
