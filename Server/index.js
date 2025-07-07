@@ -30,22 +30,24 @@ function getLobbyID(){
   return lobbyStack.pop();
 }
 
+
+
 io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
-  const activeUser = []
-  for (let key in userConnections){
-    if (userConnections.hasOwnProperty(key)) {
-          activeUser.push(key)
-      }
-  }
-
-  io.emit("active players", activeUser)
 
   const userID = socket.handshake.auth.clientID
   console.log(userID)
 
   userConnections[userID] = socket.id;
   console.log(userConnections);
+
+  const activeUser = []
+  for (let key in userConnections){
+    if (userConnections.hasOwnProperty(key)) {
+          activeUser.push(key)
+      }
+  }
+  io.emit("active players", activeUser)
 
   socket.on('sendPlay', (opponentID, senderID, play) => {
     console.log("Play: " + play)
