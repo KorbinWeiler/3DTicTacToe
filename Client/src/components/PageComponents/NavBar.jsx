@@ -15,7 +15,7 @@ export default function Navbar(){
                 <a href="/invites">Game Invites</a>
                 <a href="/Games">Games</a>
                 <a href="/">Profile</a>
-                {clientID ? <button className="button nav-login" onClick={()=>{setClientID("")}}>Sign Out</button> : <button className="button nav-login" onClick={()=>{setClientID("5")}}>Login</button>}                
+                {clientID ? <button className="button nav-login-button" onClick={()=>{setClientID("")}}>Sign Out</button> : <button className="button nav-login-button" onClick={()=>{setClientID("5")}}>Login</button>}     
             </nav>
             <SidebarIcon destinationLink={"/Login"}/>
         </div>

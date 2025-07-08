@@ -34,6 +34,7 @@ export default function HomePage(){
               <p>Active User</p>
               <hr className="break"/>
               {users ? users.map((item, i)=>(<PlayerComponent key={i} PlayerID={item}/>)) : null}
+              <button className="user-invite plus-sign"></button>
             </div>
             <div className="miscDetails">
               <div className="userDetails">

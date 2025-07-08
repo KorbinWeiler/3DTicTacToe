@@ -5,7 +5,7 @@ export default function PlayerComponent(PlayerID){
     const [clientID, setClientID] = ClientID
     return(
         <div>
-            <button className="main-page-invite-button plus-sign" title="Invite Player" type="button" onClick={()=>{socket.emit("invite", PlayerID.PlayerID, clientID)}}></button>
+            <button className="main-page-invite-button plus-sign active-user" title="Invite Player" type="button" onClick={()=>{socket.emit("invite", PlayerID.PlayerID, clientID)}}></button>
             {PlayerID.PlayerID}
         </div>
     )
