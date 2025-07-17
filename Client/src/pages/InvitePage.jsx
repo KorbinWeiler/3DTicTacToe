@@ -1,10 +1,8 @@
 import Navbar from "../components/PageComponents/NavBar"
 import InviteList from "../components/PageComponents/InviteList"
+import InviteModal from "../components/PageComponents/InviteModal"
 import { useState, useContext } from "react"
 import { gameContext } from "../App"
-import Modal from "react-modal"
-
-Modal.setAppElement('div');
 
 export default function InvitePage({invites}){
     
@@ -13,32 +11,10 @@ export default function InvitePage({invites}){
     const socket = Socket
 
     let tempOpponentID = ""
-    
-    const [isOpen, setIsOpen] = useState(false);
+
+    const [isOpen, setIsOpen] = useState(false)
 
     const temp = [1,2,3,4,5,6,7,8,9,10,11]
-
-    function openModal(){
-        setIsOpen(true);
-    }
-
-    function afterOpenModal(){
-
-    }
-
-    function closeModal(){
-        setIsOpen(false);
-    }
-    const customStyles = {
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-    },
-    };
 
     return(
         <div>
@@ -57,21 +33,8 @@ export default function InvitePage({invites}){
                     {/* <InviteList invites={invites}></InviteList> */}
                     <InviteList invites={temp}></InviteList>
                 </div>
-                <button className="button invite-button" type="button" onClick={openModal}>Invite Player</button>
-                <Modal 
-                isOpen={isOpen}
-                ariaHideApp={false}
-                onAfterOpen={afterOpenModal}
-                onRequestClose={closeModal}
-                style={customStyles}
-                className={"modal"}
-                contentLabel="Invite Modal">
-                    
-                    <form className="modal-alignment">
-                        <input className="text-input" type="text" placeholder="Opponent Username" onChange={(e)=>{tempOpponentID = e}}></input>
-                        <button className="button" type="button" onClick={()=>{socket.emit("invite", tempOpponentID, clientID)}}>Send Invite</button>
-                    </form>
-                </Modal>
+                <button className="button invite-button" type="button" onClick={()=>{setIsOpen(true)}}>Invite Player</button>
+                <InviteModal open={[isOpen, setIsOpen]}></InviteModal>
             </div>
         </div>
     )
