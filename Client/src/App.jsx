@@ -10,8 +10,12 @@ import {useEffect, useState, createContext} from "react"
 import { restoreBoardFunctionality } from "./Utils/GameBoardUtils";
 import { useNavigate } from "react-router-dom";
 
+const jwt = require("jsonwebtoken")
 
-const socket = io('http://localhost:3000', {autoConnect: false});
+require("dotenv").config()
+
+
+const socket = io(process.env.SERVER_URL, {autoConnect: false});
 
 export const gameContext = new createContext(null);
 
@@ -39,14 +43,22 @@ export default function App(){
   const [count, setCount] = useState(0)
 
   useEffect(()=>{
+
+    //why is this in the use effect. Should probably move it to either mount only or within the component render
+    //At least should come before building the socket connection
+    const user = sessionStorage.getItem("userID")
+    if(user != null && clientID != user){
+      const token = jwt.sign({
+        userID: user
+      }, process.env.JWT_SECRET , { expiresIn: '1h' })
+      sessionStorage.setItem("sessionToken", token)
+      setClientID(user)
+    }
+
     if(clientID){
-      console.log("hello " + clientID)
-      //userID = clientID;
       sessionStorage.setItem("userID", clientID)
       socket.auth = {clientID}
       socket.connect()
-
-      // socket.emit("test")
 
       socket.on("recieve play", (play)=>{
         const vals = JSON.parse(play.opponentPlay)
@@ -82,10 +94,12 @@ export default function App(){
 
       socket.on("game invite", (senderID)=>{
         setInvites(prev=>([...prev, senderID]))
+        //This wouldn't need to be cleared if I don't store it and only load invites when on the invites page
         sessionStorage.setItem("invites", invites)//make sure to clear this and reload whenever the user ID changes
       })
 
       //add socket end point to add game to the games list
+      //Should I do this on the server and request the games when needed or continue to store everything on the users side.
       socket.on("add game", (gameID, player1, player2)=>{
         console.log(gameID + " " + player1 + " " + player2)
         games[gameID] = {
@@ -116,11 +130,6 @@ export default function App(){
       socket.on("test message", ()=>{
         console.log("Success");
       })
-    }
-
-    const user = sessionStorage.getItem("userID")
-    if(user != null && clientID != user){
-      setClientID(user)
     }
 
     // const gameList= sessionStorage.getItem("ongoing games")
