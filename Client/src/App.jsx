@@ -9,13 +9,11 @@ import { io } from 'socket.io-client';
 import {useEffect, useState, createContext} from "react"
 import { restoreBoardFunctionality } from "./Utils/GameBoardUtils";
 import { useNavigate } from "react-router-dom";
-
-const jwt = require("jsonwebtoken")
-
-require("dotenv").config()
+import {jwtDecode} from "jwt-decode";
 
 
-const socket = io(process.env.SERVER_URL, {autoConnect: false});
+
+const socket = io("http://localhost:3000", {autoConnect: false});
 
 export const gameContext = new createContext(null);
 
@@ -47,16 +45,23 @@ export default function App(){
     //why is this in the use effect. Should probably move it to either mount only or within the component render
     //At least should come before building the socket connection
     const user = sessionStorage.getItem("userID")
-    if(user != null && clientID != user){
-      const token = jwt.sign({
-        userID: user
-      }, process.env.JWT_SECRET , { expiresIn: '1h' })
-      sessionStorage.setItem("sessionToken", token)
+    const SessionToken = sessionStorage.getItem("sessionToken")
+    console.log(SessionToken)
+    if(SessionToken == null && clientID != null){
       setClientID(user)
+    }
+    else{
+      if(SessionToken){
+        const decodedPayload = jwtDecode(SessionToken)
+        if(decodedPayload.userID != clientID){
+          setClientID(decodedPayload.userID)
+        }
+      }
     }
 
     if(clientID){
-      sessionStorage.setItem("userID", clientID)
+
+      //sessionStorage.setItem("userID", clientID)
       socket.auth = {clientID}
       socket.connect()
 
@@ -74,6 +79,10 @@ export default function App(){
         }
         sessionStorage.setItem('ongoing games', JSON.stringify(games))
         setCount(t=>t +1)
+      })
+
+      socket.on("Authenticated", (token)=>{
+        sessionStorage.setItem("sessionToken", token)
       })
 
       socket.on("replay play", (play)=>{

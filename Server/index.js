@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
+require("dotenv").config()
 
 const app = express();
 app.use(cors());
@@ -48,6 +50,14 @@ io.on('connection', (socket) => {
       }
   }
   io.emit("active players", activeUser)
+
+  socket.on("authenticate user", (userID) =>{
+    const token = jwt.sign({
+      userID: userID
+    }, "aifjhioajfiaj" , { expiresIn: '1h' })
+    //sessionStorage.setItem("sessionToken", token)
+    io.to(userConnections[userID]).emit("Authenticated", token)
+  })
 
   socket.on('sendPlay', (opponentID, senderID, play) => {
     console.log("Play: " + play)

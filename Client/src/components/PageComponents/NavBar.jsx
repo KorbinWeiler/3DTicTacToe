@@ -15,6 +15,7 @@ export default function Navbar(){
                 <a href="/invites">Game Invites</a>
                 <a href="/Games">Games</a>
                 <a href="/">Profile</a>
+                {/* make it so clicking login send the authenitcation message through the socket. Actually make it go to the login screen but this works for now */}
                 {clientID ? <button className="button nav-login-button" onClick={()=>{setClientID("")}}>Sign Out</button> : <button className="button nav-login-button" onClick={()=>{setClientID("5")}}>Login</button>}     
             </nav>
             <SidebarIcon destinationLink={"/Login"}/>
