@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const SECRET = 'your_jwt_secret'; // Use env variable in production
+const SECRET = env.JWT_SECRET;
 const users = []; // In-memory user store for demo
 
 // Register
