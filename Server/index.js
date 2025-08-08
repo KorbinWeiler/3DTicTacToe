@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
   }
   io.emit("active players", activeUser)
 
-  socket.on("authenticate user", (userID) =>{
+  socket.on("authenticate user", (userID, password) =>{
     const token = jwt.sign({
       userID: userID
     }, "aifjhioajfiaj" , { expiresIn: '1h' })

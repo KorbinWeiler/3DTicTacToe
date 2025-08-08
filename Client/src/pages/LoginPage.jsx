@@ -9,18 +9,24 @@ export default function LoginPage(){
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
 
-    const {ClientID} = useContext(gameContext)
+    const {ClientID, Socket} = useContext(gameContext)
     const [clientID, setClientID] = ClientID
+    const socket = Socket
 
     const [inactive, setActivive] = useState(true)
     const [error, setError] = useState(false);
 
-    function validateUser(username, password){
+    async function validateUser(username, password){
         if(username === '' && password === ''){
             validUserLogin = false;
         }
         if (validUserLogin){
             setClientID(username)
+            const passwordBuffer = new TextEncoder().encode(password)
+            const data = await crypto.subtle.digest('SHA-256', passwordBuffer)
+            const hashArray = Array.from(new Uint8Array(data));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            socket.emit("authenticate user", username, hashHex)
             navigate("/")
         }
     }
