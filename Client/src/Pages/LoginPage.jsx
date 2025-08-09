@@ -1,21 +1,28 @@
-//make a component that displays a login form with username and password fields, and a submit button
-import React, { useState } from 'react';
-//import './LoginPage.css';
-import {login} from '../Utils/Auth';
+import { useState, useContext } from 'react';
+import {login, mockLogin} from '../Utils/Auth';
+import { UserContext } from '../App';
+import { useNavigate } from 'react-router-dom';
+
+
 export default function LoginPage() { 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [token, setToken] = useState('');
+
+    const navigate = useNavigate();
+
+    const { Token: [token, setToken] } = useContext(UserContext);
     
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle login logic here
-        newToken = login(username, password);
-        if (!newToken) {
+        const newToken = mockLogin(username, password);
+        if (newToken) {
            setToken(newToken);
+           navigate('/')
         }
         console.log('Username:', username);
         console.log('Password:', password);
+        console.log('Token:', newToken);
     };
     
     return (
@@ -43,6 +50,7 @@ export default function LoginPage() {
             />
             </div>
             <button type="submit" onClick={handleSubmit}>Login</button>
+            <a href='/Register'>Register as a new user</a>
         </form>
         </div>
     );
