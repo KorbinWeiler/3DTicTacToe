@@ -10,19 +10,22 @@ export default function LoginPage() {
 
     const navigate = useNavigate();
 
-    const { Token: [token, setToken] } = useContext(UserContext);
+    const { Token: [token, setToken], User } = useContext(UserContext);
+    let user = User
     
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle login logic here
-        const newToken = mockLogin(username, password);
-        if (newToken) {
-           setToken(newToken);
-           navigate('/')
+        const LoginData = mockLogin(username, password);
+        if (LoginData) {
+            sessionStorage.setItem('user', LoginData.user);
+            user = LoginData.user;
+            setToken(LoginData.token);
+            navigate('/')
         }
         console.log('Username:', username);
         console.log('Password:', password);
-        console.log('Token:', newToken);
+        console.log('Token:', LoginData.token);
     };
     
     return (

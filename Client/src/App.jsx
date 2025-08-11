@@ -11,17 +11,19 @@ export const UserContext = createContext();
 function App() {
 
   const [token, setToken] = useState(sessionStorage.getItem('token'));
+  let user = sessionStorage.getItem('user');
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem('token');
     if (storedToken != token) {
       sessionStorage.setItem('token', token)
+      sessionStorage.setItem('user', user);
     }
   }, [token]);
 
   return (
     <>
-    <UserContext.Provider value={{Token: [token, setToken]}}>
+    <UserContext.Provider value={{Token: [token, setToken], User: user}}>
       <Router>
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
