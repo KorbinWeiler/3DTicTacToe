@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser, login } from '../Utils/Auth';
 import { UserContext } from '../App';
+import '../Styles/RegistrationPage.css';
 
 
 export default function RegistrationPage() {
@@ -30,8 +31,8 @@ export default function RegistrationPage() {
     };
 
     return (
-        <div className="registration-container">
-            <form onSubmit={handleSubmit}>
+        <div className="registration-page">
+            <form className='registration-form' onSubmit={handleSubmit}>
                 <h2>Register</h2>
                 <div className="input-group">
                     <label htmlFor="username">Username</label>
@@ -75,6 +76,7 @@ export default function RegistrationPage() {
                 </div>
                 <button type="submit">Register</button>
             </form>
+            <a href="/login" className="registration-link">Already have an account? Login</a>
         </div>
     );
 }

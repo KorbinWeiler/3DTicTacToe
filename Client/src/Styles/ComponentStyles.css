@@ -1,0 +1,27 @@
+.navbar{
+    display: flex;
+
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: green;
+}
+
+.navbar-item{
+    padding: 20px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar-item:hover{
+    color: yellow;
+}
+
+.login-links{
+    display: flex;
+    flex-direction: column;
+}

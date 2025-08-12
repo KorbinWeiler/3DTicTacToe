@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import {login, mockLogin} from '../Utils/Auth';
 import { UserContext } from '../App';
 import { useNavigate } from 'react-router-dom';
+import '../Styles/LoginPage.css';
 
 
 export default function LoginPage() { 
@@ -29,9 +30,10 @@ export default function LoginPage() {
     };
     
     return (
-        <div className="login-container">
-        <form>
-            <h2>Login</h2>
+        <>
+        <div className="login-page">
+        <form className='login-form'>
+            <h2 className='login-header'>Login</h2>
             <div className="input-group">
             <label htmlFor="username">Username</label>
             <input
@@ -53,8 +55,12 @@ export default function LoginPage() {
             />
             </div>
             <button type="submit" onClick={handleSubmit}>Login</button>
-            <a href='/Register'>Register as a new user</a>
         </form>
         </div>
+        <div className="login-links">
+            <a href='/Register'>Register as a new user</a>
+            <a href='/'>Continue as Guest</a>
+        </div>
+        </>
     );
 }

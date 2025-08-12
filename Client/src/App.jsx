@@ -10,7 +10,8 @@ export const UserContext = createContext();
 
 function App() {
 
-  const [token, setToken] = useState(sessionStorage.getItem('token'));
+  //const [token, setToken] = useState(sessionStorage.getItem('token'));
+  const [token, setToken] = ("jafijajfoiajf")
   let user = sessionStorage.getItem('user');
 
   useEffect(() => {
