@@ -4,9 +4,10 @@ import {UserContext} from '../App';
 import Navbar from '../Components/Navbar';
 
 const HomePage = () => {
-  const user = {name: 'PlayerOne', rank: 5, points: 1200 }
+  //const user = {name: 'PlayerOne', rank: 5, points: 1200 }
 
-  const { Token } = useContext(UserContext);
+  const { Token, User } = useContext(UserContext);
+  const user = User;
   const [token, setToken] = Token;
   const [myTurnGames, setMyTurnGames] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);

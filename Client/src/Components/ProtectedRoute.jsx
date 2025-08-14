@@ -4,7 +4,7 @@ import { UserContext } from '../App';
 
 const ProtectedRoute = ({ children }) => {
   const { Token } = useContext(UserContext);
-  const [token] = Token;
+  const [token, setToken] = Token;
 
   // If there's no token, redirect to login
   if (!token) {
