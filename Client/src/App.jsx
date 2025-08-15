@@ -7,6 +7,8 @@ import HomePage from './Pages/HomePage';
 import RegistrationPage from './Pages/RegistrationPage';
 import ProfilePage from './Pages/ProfilePage';
 import InvitePage from './Pages/InvitePage';
+import FriendsPage from './Pages/FriendsPage';
+import GamesPage from './Pages/GamesPage';
 
 export const UserContext = createContext();
 
@@ -35,6 +37,9 @@ function App() {
           <Route path="/Register" element={<RegistrationPage/>}/>
           <Route path="/Profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/Invite" element={<ProtectedRoute><InvitePage /></ProtectedRoute>} />
+          <Route path="/Friends" element={<ProtectedRoute><FriendsPage /></ProtectedRoute>} />
+          <Route path="/Games" element={<ProtectedRoute><GamesPage /></ProtectedRoute>} />
+          <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </Router>
     </UserContext.Provider>
