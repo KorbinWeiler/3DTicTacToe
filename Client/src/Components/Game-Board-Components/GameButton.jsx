@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { GameIDContext } from "./GameBoard";
+import "../../Styles/ComponentStyles.css";
 
 export default function GameButton({ x, y, z, value}){
     const { gameID } = useContext(GameIDContext);
@@ -12,7 +13,15 @@ export default function GameButton({ x, y, z, value}){
         buttonClass += " o";
     }
 
+    function handleClick() {
+        if(value === "") {
+            // Simulate a move
+            const newValue = playValue === "X" ? "O" : "X";
+            console.log(`Game ID: ${gameID}, Move: (${x}, ${y}, ${z}) set to ${newValue}`);
+        }
+    }
+
     return (
-        <button className={buttonClass}></button>
+        <button className={buttonClass} onClick={handleClick}></button>
     );
 }
