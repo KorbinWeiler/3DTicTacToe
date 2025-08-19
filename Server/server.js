@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const env = require('dotenv').config();
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
 app.use(express.json());
@@ -10,6 +12,15 @@ app.use(cors());
 
 const SECRET = env.JWT_SECRET;
 const users = []; // In-memory user store for demo
+
+// Create HTTP server and Socket.IO server
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 
 // Register
 app.post('/register', async (req, res) => {
@@ -43,4 +54,19 @@ app.get('/profile', (req, res) => {
   }
 });
 
-app.listen(4000, () => console.log('Server running on http://localhost:4000'));
+// Socket.IO implementation
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Example: broadcast a message to all clients
+  socket.on('Inform', (TargetUser) => {
+    io.to(TargetUser.ID).emit('Update', msg);
+  });
+
+  // Example: handle user disconnect
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+server.listen(4000, () => console.log('Server running on http://localhost:4000'));
