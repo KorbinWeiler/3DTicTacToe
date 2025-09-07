@@ -1,7 +1,7 @@
 import './App.css'
 import LoginPage from './Pages/LoginPage'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import {useState, createContext, useEffect, use} from 'react'
+import {useState, createContext, useEffect} from 'react'
 import { io } from "socket.io-client";
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
 import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
@@ -26,7 +26,7 @@ function App() {
   const SERVER_URL = "http://localhost:4000";
 
   const socket = io(SERVER_URL, {
-    autoConnect: true,
+    autoConnect: false,
     transports: ["websocket"],
   });
 
@@ -35,6 +35,9 @@ function App() {
     if (storedToken != token) {
       sessionStorage.setItem('token', token)
       sessionStorage.setItem('user', user);
+
+      socket.auth = { user: user.name };
+      socket.connect();
 
       socket.on("Update", () => {
         setUpdateFlag(prev => !prev); // Toggle the update flag to force a re-render

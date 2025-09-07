@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import '../Styles/HomePage.css';
 import {UserContext} from '../App';
 import Navbar from '../Components/Navbar';
+import { getGlobalLeaderBoard, getUserGames } from '../Utils/Get-API';
 
 const HomePage = () => {
   //const user = {name: 'PlayerOne', rank: 5, points: 1200 }
@@ -24,7 +25,13 @@ const HomePage = () => {
 //   }, []);
 
   useEffect(() => {
-    // Mock data – replace with API calls
+    // Mock data – replace with API calls 
+
+    const games = getUserGames();
+    const leaderboard = getGlobalLeaderBoard();
+
+    const filteredGames = games.filter(item => item.playerTurn === myUserName);
+
     setMyTurnGames([
       { id: 'game1', opponent: 'Alice', lastMove: '2025-08-10' },
       { id: 'game2', opponent: 'Bob', lastMove: '2025-08-09' }

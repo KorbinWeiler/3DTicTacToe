@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 const SECRET = env.JWT_SECRET;
+const activeUsers = {}; // Store active users for Socket.IO
 const users = []; // In-memory user store for demo
 
 // Create HTTP server and Socket.IO server
@@ -56,16 +57,58 @@ app.get('/profile', (req, res) => {
 
 // Socket.IO implementation
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  function addFriendRequest(data){
+    console.log(`Friend request from ${data}`);
+    // Logic to handle friend request
+  }
 
+  function addFriend(data){
+    console.log(`Friend added: ${data}`);
+    // Logic to handle adding a friend
+  }
+
+  function addGameInvite(data){
+    console.log(`Game invite from ${data}`);
+    // Logic to handle game invite
+  }
+
+  function addGame(data){
+    console.log(`Game added: ${data}`);
+  }
+
+  function movePlayed(data){
+    console.log(`Move played: ${data}`);
+    // Logic to handle move played
+  }
+
+  const eventList = {"FriendRequest": addFriendRequest, "AddFriend": addFriend, "GameInvite": addGameInvite, "AddGame": addGame,
+    "MovePlayed": movePlayed};
+
+  function handleEvent(eventList, eventType, targetUser, data){
+    eventList[eventType](data);
+    io.to(activeUsers[targetUser]).emit('Update', data);
+  }
+
+  console.log('A user connected:', socket.id);
+  socket.emit('Users Updated', socket.id);
+  activeUsers[socket.userName] = socket.id; // map username to socket ID
+ 
   // Example: broadcast a message to all clients
-  socket.on('Inform', (TargetUser) => {
+  socket.on('Inform', (content) => {
+    handleEvent(eventList, content.type, content.data.TargetUser, content.data);
     io.to(TargetUser.ID).emit('Update', msg);
   });
 
   // Example: handle user disconnect
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+    for (const [username, id] of Object.entries(activeUsers)) {
+      if (id === socket.id) {
+        delete activeUsers[username];
+        break;
+      }
+    }
+    socket.broadcast.emit('Users Updated', socket.id);
   });
 });
 
