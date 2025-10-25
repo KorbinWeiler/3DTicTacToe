@@ -1,6 +1,8 @@
 import { processPostRequest } from "./APIHelper";
 
-const serverURL = "http://localhost:4000";
+const serverIP = import.meta.env.SERVER_IP
+const serverPort = import.meta.env.SERVER_PORT
+const url = `http://${serverIP}:${serverPort}`;
 
 async function updateUserInfo(updatedUserInfo){
     const url = serverURL + `/update/User`;

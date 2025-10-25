@@ -1,6 +1,8 @@
 import { processGetRequest } from "./APIHelper";
 
-const serverURL = "http://localhost:4000";
+const serverIP = import.meta.env.SERVER_IP
+const serverPort = import.meta.env.SERVER_PORT
+const url = `http://${serverIP}:${serverPort}`;
 
 // function getActiveUsers(){
 //     const apiURL = serverURL + "/activeUsers";
@@ -22,7 +24,7 @@ const serverURL = "http://localhost:4000";
 // }
 
 async function getActiveUsers(){
-    const url = serverURL + "/activeUsers"
+    const url = serverURL + "/users/active"
     const res = await processGetRequest(url);
     if(res){
         return res;
@@ -69,6 +71,14 @@ async function getLocalLeaderBoard(userID){
     }
 }
 
+async function fuzzyFindUsers(username){
+    const url = serverURL + `/users/${username}/`
+    const res = await processGetRequest(url)
+    if(res){
+        return res
+    }
+}
+
 // async function getData() {
 //   const url = "https://example.org/products.json";
 //   try {
@@ -84,4 +94,4 @@ async function getLocalLeaderBoard(userID){
 //   }
 // }
 
-export { getActiveUsers, getUserGames, getFriendRequests, getUserFriends, getGlobalLeaderBoard, getLocalLeaderBoard };
+export { getActiveUsers, getUserGames, getFriendRequests, getUserFriends, getGlobalLeaderBoard, getLocalLeaderBoard, fuzzyFindUsers };

@@ -30,7 +30,7 @@ const HomePage = () => {
     const games = getUserGames();
     const leaderboard = getGlobalLeaderBoard();
 
-    const filteredGames = games.filter(item => item.playerTurn === myUserName);
+    //const filteredGames = games.filter(item => item.playerTurn === myUserName);
 
     setMyTurnGames([
       { id: 'game1', opponent: 'Alice', lastMove: '2025-08-10' },

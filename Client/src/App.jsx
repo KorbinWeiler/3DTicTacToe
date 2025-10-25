@@ -1,6 +1,6 @@
 import './App.css'
 import LoginPage from './Pages/LoginPage'
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, BrowserRouter} from 'react-router-dom'
 import {useState, createContext, useEffect} from 'react'
 import { io } from "socket.io-client";
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
@@ -53,7 +53,7 @@ function App() {
   return (
     <>
     <UserContext.Provider value={{Token: [token, setToken], UpdateFlag: [updateFlag, setUpdateFlag], User: user}}>
-      <Router>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/login" element={<LoginPage />} />
@@ -65,7 +65,7 @@ function App() {
           <Route path="/Game/:gameID" element={<RestrictedRoute><PlayGamePage /></RestrictedRoute>} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </UserContext.Provider>
     </>
   )

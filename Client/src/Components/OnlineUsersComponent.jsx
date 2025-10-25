@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getActiveUsers } from "../Utils/Get-API";
 
 export default function OnlineUsersComponent(){
     const [onlineUsers, setOnlineUsers] = useState([]);
@@ -12,6 +13,8 @@ export default function OnlineUsersComponent(){
         };
 
         fetchOnlineUsers();
+        // const users = getActiveUsers();
+        // setOnlineUsers(users);
     }, [refresh]);
 
     return (

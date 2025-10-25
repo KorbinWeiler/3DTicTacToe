@@ -1,9 +1,11 @@
 import { useState } from "react"
+import { fuzzyFindUsers } from "../Utils/Get-API";
 export default function SearchUserComponent(){
     const [targetUsername, setTargetUsername] = useState("")
     const handleSearch = (e) => {
         e.preventDefault();
         // Implement search logic here
+        validUsers = fuzzyFindUsers(targetUsername)
         console.log("Searching for user:", targetUsername);
     }
     return (

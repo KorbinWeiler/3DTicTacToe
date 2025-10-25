@@ -17,7 +17,7 @@ export default function LoginPage() {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle login logic here
-        const LoginData = mockLogin(username, password);
+        const LoginData = mockLogin(username, password); //change from mockLogin
         if (LoginData) {
             sessionStorage.setItem('user', LoginData.user);
             user = LoginData.user;

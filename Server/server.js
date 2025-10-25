@@ -34,12 +34,12 @@ app.post('/register', async (req, res) => {
 // Login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const user = users.find(u => u.username === username);
+  const user = users.find(u => u.username === username); // replace with database query
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
   const token = jwt.sign({ username }, SECRET, { expiresIn: '1h' });
-  res.json({ token });
+  res.json({ token: token, User: {username: username, email: "Email", points: 10}});
 });
 
 // Protected route

@@ -10,7 +10,7 @@ const login = async (Username, Password) => {
         username: Username,
         password: Password
     });
-    return res.data.token;
+    return res;
 };
 
 const getProfile = async () => {
@@ -18,7 +18,7 @@ const getProfile = async () => {
     const res = await axios.get(profileURL, {
         headers: { Authorization: `Bearer ${token}` }
     });
-    return res.data
+    return res;
 };
 
 const registerUser = async (username, email, password) => {
@@ -28,7 +28,7 @@ const registerUser = async (username, email, password) => {
         password: password,
         email: email
     })
-    return res.data;
+    return res;
 };
 
 const mockLogin = (Username, Password) => {
