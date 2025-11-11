@@ -2,7 +2,7 @@ import { processGetRequest } from "./APIHelper";
 
 const serverIP = import.meta.env.SERVER_IP
 const serverPort = import.meta.env.SERVER_PORT
-const url = `http://${serverIP}:${serverPort}`;
+const serverURL = `http://${serverIP}:${serverPort}`;
 
 // function getActiveUsers(){
 //     const apiURL = serverURL + "/activeUsers";

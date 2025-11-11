@@ -3,10 +3,11 @@ import '../Styles/HomePage.css';
 import {UserContext} from '../App';
 import Navbar from '../Components/Navbar';
 import { getGlobalLeaderBoard, getUserGames } from '../Utils/Get-API';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   //const user = {name: 'PlayerOne', rank: 5, points: 1200 }
-
+  const nav = useNavigate();
   const { Token, User } = useContext(UserContext);
   const user = User;
   const [token, setToken] = Token;
@@ -29,12 +30,14 @@ const HomePage = () => {
 
     const games = getUserGames();
     const leaderboard = getGlobalLeaderBoard();
-
     //const filteredGames = games.filter(item => item.playerTurn === myUserName);
+    if(Array.isArray(games)){
+      games.filter(item => item.playerTurn === user.name);
+    }
 
     setMyTurnGames([
-      { id: 'game1', opponent: 'Alice', lastMove: '2025-08-10' },
-      { id: 'game2', opponent: 'Bob', lastMove: '2025-08-09' }
+      { id: '1', opponent: 'Alice', lastMove: '2025-08-10' },
+      { id: '2', opponent: 'Bob', lastMove: '2025-08-09' }
     ]);
 
     setLeaderboard([
@@ -63,7 +66,7 @@ const HomePage = () => {
                 {myTurnGames.map((game) => (
                   <li className='listItem' key={game.id}>
                     <strong>vs {game.opponent}</strong> — Last move: {game.lastMove}
-                    <button onClick={() => alert(`Open Game ID: ${game.id}`)}>Play</button>
+                    <button onClick={()=>{nav(`/Game/${game.id}`)}}>Play</button>
                   </li>
                 ))}
               </ul>
