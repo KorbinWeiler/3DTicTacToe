@@ -1,6 +1,6 @@
 import './App.css'
 import LoginPage from './Pages/LoginPage'
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, redirect} from 'react-router-dom'
 import {useState, createContext, useEffect} from 'react'
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
 import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
@@ -11,21 +11,21 @@ import InvitePage from './Pages/InvitePage';
 import FriendsPage from './Pages/FriendsPage';
 import GamesPage from './Pages/GamesPage';
 import PlayGamePage from './Pages/PlayGamePage';
-
-export const UserContext = createContext();
+import { UserContext } from './Utils/UserContext';
 
 function App() {
   sessionStorage.setItem('user', JSON.stringify({name: 'PlayerOne', rank: 5, points: 1200, gameID: '1' }));
-  //const [token, setToken] = useState(sessionStorage.getItem('token'));
-  const [token, setToken] = ("jafijajfoiajf")
+  const [token, setToken] = useState(sessionStorage.getItem('token') || '');
   let user = JSON.parse(sessionStorage.getItem('user'));
   console.log("User: ", user);
+  //console.log("Token: ", token);
 
   useEffect(() => {
-    const storedToken = sessionStorage.getItem('token');
-    if (storedToken != token) {
+    //const storedToken = sessionStorage.getItem('token');
+    if (sessionStorage.getItem('token') != token) {
+      console.log("Token Value: " + token)
       sessionStorage.setItem('token', token)
-      sessionStorage.setItem('user', user);
+      sessionStorage.setItem('user', JSON.stringify(user));
     }
   }, [token]);
 

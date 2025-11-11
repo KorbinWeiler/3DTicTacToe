@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import {login, mockLogin} from '../Utils/Auth';
-import { UserContext } from '../App';
+import {UserContext} from '../Utils/UserContext'
 import { useNavigate } from 'react-router-dom';
 import '../Styles/LoginPage.css';
 
@@ -11,7 +11,8 @@ export default function LoginPage() {
 
     const navigate = useNavigate();
 
-    const { Token: [token, setToken], User } = useContext(UserContext);
+    const { Token, User } = useContext(UserContext);
+    const [token, setToken] = Token;
     let user = User
     
     const handleSubmit = (e) => {
@@ -20,13 +21,14 @@ export default function LoginPage() {
         const LoginData = mockLogin(username, password);
         if (LoginData) {
             sessionStorage.setItem('user', LoginData.user);
+            sessionStorage.setItem('token', LoginData.token);
             user = LoginData.user;
-            setToken(LoginData.token);
-            navigate('/')
+            const newToken = LoginData.token;
+            setToken(newToken);
+            navigate('/');
         }
         console.log('Username:', username);
         console.log('Password:', password);
-        console.log('Token:', LoginData.token);
     };
     
     return (

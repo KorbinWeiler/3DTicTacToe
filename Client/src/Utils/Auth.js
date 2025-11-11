@@ -34,10 +34,10 @@ const registerUser = async (username, email, password) => {
 const mockLogin = (Username, Password) => {
     // Mock login function for testing purposes
     if (Username === 'test' && Password === 'password') {
-        return 'mocked_token_12345';
+        return {token: Date.now().toString(), user: null};
     }
     else{
-        return "Bad Credentials";
+        return null;
     }
 }
 

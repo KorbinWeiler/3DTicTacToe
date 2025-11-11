@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser, login } from '../Utils/Auth';
-import { UserContext } from '../App';
+import { UserContext } from '../Utils/UserContext';
 import '../Styles/RegistrationPage.css';
 
 

@@ -1,7 +1,7 @@
-import Navbar from "../Components/Navbar"
+import Navbar from "../components/Navbar"
 import "../Styles/ProfilePage.css";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "../Utils/UserContext";
 export default function ProfilePage() {
 
     const {User} = useContext(UserContext); 

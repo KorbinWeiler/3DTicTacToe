@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import '../Styles/HomePage.css';
-import {UserContext} from '../App';
-import Navbar from '../Components/Navbar';
+import {UserContext} from '../Utils/UserContext';
+import Navbar from '../components/Navbar';
 
 const HomePage = () => {
   //const user = {name: 'PlayerOne', rank: 5, points: 1200 }
