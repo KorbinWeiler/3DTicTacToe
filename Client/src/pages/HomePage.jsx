@@ -1,58 +1,81 @@
-import { useContext, useState, useEffect } from "react"
-import { gameContext } from "../App"
-import PlayerComponent from "../components/PageComponents/PlayerComponent"
-import Navbar from "../components/PageComponents/NavBar"
+import React, { useEffect, useState, useContext } from 'react';
+import '../Styles/HomePage.css';
+import {UserContext} from '../App';
+import Navbar from '../Components/Navbar';
 
-export default function HomePage(){
+const HomePage = () => {
+  //const user = {name: 'PlayerOne', rank: 5, points: 1200 }
 
-  const {Socket} = useContext(gameContext)
-  const [users, setUsers] = useState([1,2,3,4,5,6,7,8,9])
+  const { Token, User } = useContext(UserContext);
+  const user = User;
+  const [token, setToken] = Token;
+  const [myTurnGames, setMyTurnGames] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  
+//   useEffect(() => {
+//     // Mock user info fetch
+//     const storedUser = {
+//       name: 'Jane Doe',
+//       email: 'jane.doe@example.com',
+//       role: 'Frontend Developer',
+//     };
+
+//     setUser(storedUser);
+//   }, []);
+
   useEffect(() => {
-    // Listener
-    const handleActivePlayers = (list) => {
-      if (JSON.stringify(list) !== JSON.stringify(users)) {
-        setUsers(list);
-      }
-    };
+    // Mock data – replace with API calls
+    setMyTurnGames([
+      { id: 'game1', opponent: 'Alice', lastMove: '2025-08-10' },
+      { id: 'game2', opponent: 'Bob', lastMove: '2025-08-09' }
+    ]);
 
-    Socket.on("active players", handleActivePlayers);
-
-    // Emit only once when component mounts
-    Socket.emit("request users");
-
-    // Cleanup to avoid memory leaks or duplicate listeners
-    return () => {
-      Socket.off("active players", handleActivePlayers);
-    };
+    setLeaderboard([
+      { name: 'Alice', points: 1500 },
+      { name: 'Charlie', points: 1350 },
+      { name: 'PlayerOne', points: 1200 },
+      { name: 'Bob', points: 1100 }
+    ]);
   }, []);
 
-  return(
-      <div>
-          <Navbar/>
-          <div className="mainView">
-            <div className="UserList widget">
-              <p>Active User</p>
-              <hr className="break"/>
-              {users ? users.map((item, i)=>(<PlayerComponent key={i} PlayerID={item}/>)) : null}
-              <button className="user-invite plus-sign"></button>
-            </div>
-            <div className="miscDetails">
-              <div className="userDetails">
-                <div className="ranking widget textWidget">
-                  <p>?</p>
-                </div>
-                <div className="other-detail widget textWidget">
-                  <p>Your Ranking value</p>
-                </div>
-              </div>
-              <div className="ongoingGames widget textWidget">
-                <p>Games that are your turn</p>
-              </div>
-              <div className="leaderBoard widget textWidget">
-                <p>Leaderboard</p>
-              </div>
-            </div>
-          </div>
+  return (
+    <div className="homepage">
+      <Navbar />
+      <h1>Welcome, {user.name}!</h1>
+      <div className='UserInfo'>
+        <div>
+          <header>
+            <p>Rank #{user.rank} — {user.points} pts</p>
+          </header>
+          <section className="my-turn">
+            <h2>Your Turn</h2>
+            {myTurnGames.length === 0 ? (
+              <p>No games waiting for your move.</p>
+            ) : (
+              <ul>
+                {myTurnGames.map((game) => (
+                  <li className='listItem' key={game.id}>
+                    <strong>vs {game.opponent}</strong> — Last move: {game.lastMove}
+                    <button onClick={() => alert(`Open Game ID: ${game.id}`)}>Play</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+        <section className="leaderboard">
+          <h2>Leaderboard</h2>
+          <ol>
+            {leaderboard.map((player, index) => (
+              <li key={index}>
+                {player.name} — {player.points} pts
+              </li>
+            ))}
+          </ol>
+        </section>
       </div>
-  )
-}
+    </div>
+  );
+};
+
+export default HomePage;

@@ -1,38 +1,66 @@
-import { useState, useContext } from "react";
-import { gameContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { useState, useContext } from 'react';
+import {login, mockLogin} from '../Utils/Auth';
+import { UserContext } from '../App';
+import { useNavigate } from 'react-router-dom';
+import '../Styles/LoginPage.css';
 
-export default function LoginPage(){
-    let validUserLogin = true
-    const navigate = useNavigate()
 
-    const [userName, setUserName] = useState("")
-    const [password, setPassword] = useState("")
+export default function LoginPage() { 
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-    const {ClientID} = useContext(gameContext)
-    const [clientID, setClientID] = ClientID
+    const navigate = useNavigate();
 
-    const [inactive, setActivive] = useState(true)
-    const [error, setError] = useState(false);
-
-    function validateUser(username, password){
-        if(username === '' && password === ''){
-            validUserLogin = false;
+    const { Token: [token, setToken], User } = useContext(UserContext);
+    let user = User
+    
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Handle login logic here
+        const LoginData = mockLogin(username, password);
+        if (LoginData) {
+            sessionStorage.setItem('user', LoginData.user);
+            user = LoginData.user;
+            setToken(LoginData.token);
+            navigate('/')
         }
-        if (validUserLogin){
-            setClientID(username)
-            navigate("/")
-        }
-    }
-
-    return(
-            <div className="login box-format">
-                <form>
-                    {error ? <p className="error">Username or Password is incorrect</p> : null}
-                    <input className="text-input" type='text' placeholder="Username" onChange={(e)=>{setUserName(e.target.value); if(userName != "" && password != ''){setActivive(false)}}}></input>
-                    <input className="text-input" type="password" placeholder="Password" onChange={(e)=>{setPassword(e.target.value); if(userName != "" && password != ''){setActivive(false)}}}/>
-                    <button className="button login-button" type='button' disabled={inactive} onClick={()=>{console.log(userName); validateUser(userName, password)}}>Login</button>
-                </form>
+        console.log('Username:', username);
+        console.log('Password:', password);
+        console.log('Token:', LoginData.token);
+    };
+    
+    return (
+        <>
+        <div className="login-page">
+        <form className='login-form'>
+            <h2 className='login-header'>Login</h2>
+            <div className="input-group">
+            <label htmlFor="username">Username</label>
+            <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+            />
             </div>
-    )
+            <div className="input-group">
+            <label htmlFor="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+            />
+            </div>
+            <button type="submit" onClick={handleSubmit}>Login</button>
+        </form>
+        </div>
+        <div className="login-links">
+            <a href='/Register'>Register as a new user</a>
+            <a href='/'>Continue as Guest</a>
+        </div>
+        </>
+    );
 }
