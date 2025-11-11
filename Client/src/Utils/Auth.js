@@ -37,7 +37,7 @@ const mockLogin = (Username, Password) => {
         return 'mocked_token_12345';
     }
     else{
-        return "Bad Credentials";
+        return null;
     }
 }
 

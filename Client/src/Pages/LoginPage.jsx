@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import {login, mockLogin} from '../Utils/Auth';
 import { UserContext } from '../App';
 import { useNavigate } from 'react-router-dom';
@@ -22,12 +22,20 @@ export default function LoginPage() {
             sessionStorage.setItem('user', LoginData.user);
             user = LoginData.user;
             setToken(LoginData.token);
-            navigate('/')
+        }
+        else{
+            alert("Invalid Credentials. Please try again.");
         }
         console.log('Username:', username);
         console.log('Password:', password);
         console.log('Token:', LoginData.token);
     };
+
+    useEffect(() => {
+        if (token){
+            navigate('/');
+        }
+    }, [token]);
     
     return (
         <>

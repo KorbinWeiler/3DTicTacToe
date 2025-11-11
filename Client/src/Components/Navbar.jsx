@@ -16,7 +16,7 @@ export default function Navbar() {
                     <a className="navbar-item" href="/Friends">Friends</a>
                     <a className="navbar-item" href="/Invite">Invite</a>
                     <a className="navbar-item" href="/Profile">Profile</a>
-                    <a className="navbar-item" href="/login">{token ? "Sign Out" : "Login"}</a>
+                    <a className="navbar-item" href="/login" onClick={()=>{if(token){sessionStorage.setItem("token", null)}}}>{token ? "Sign Out" : "Login"}</a>
                 </div>
             </nav>
         </>
