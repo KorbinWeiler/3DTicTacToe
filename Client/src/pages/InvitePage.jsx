@@ -1,6 +1,6 @@
 import {Children, useState} from 'react';
 import '../Styles/InvitePage.css';
-import Navbar from "../Components/Navbar";
+import Navbar from "../components/Navbar";
 import InviteComponent from '../Components/InviteComponent';
 import Modal from '../Components/Modal';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Navbar from '../Components/Navbar';
+import Navbar from '../components/Navbar';
 import Modal from "../Components/Modal";
 
 export default function FriendsPage() {
