@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import GameComponent from "./GameComponent";
 
 export default function OngoingGamesComponent() {
-    let ongoingGames = ["3", "4"]; // This is not a state because the values are not expected to change dynamically in this component.
+    let ongoingGames = [{ID: "3", Opponent: "Alice", yourTurn: true}, {ID: "4", Opponent: "Bob", yourTurn: false}]; // This is not a state because the values are not expected to change dynamically in this component.
 
     useEffect(() => {
         // This would be replaced with an actual API call to fetch ongoing games
