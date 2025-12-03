@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { GameIDContext } from "./GameBoard";
+import { SendMove } from "../../Utils/GameplayApi";
 import "../../Styles/ComponentStyles.css";
 
 export default function GameButton({ x, y, z, value}){
