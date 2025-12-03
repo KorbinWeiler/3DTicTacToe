@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import '../Styles/HomePage.css';
 import {UserContext} from '../Utils/UserContext';
 import Navbar from '../components/Navbar';
+import GameComponent from '../Components/GameComponent';
 
 const HomePage = () => {
   //const user = {name: 'PlayerOne', rank: 5, points: 1200 }
@@ -26,8 +27,8 @@ const HomePage = () => {
   useEffect(() => {
     // Mock data – replace with API calls
     setMyTurnGames([
-      { id: 'game1', opponent: 'Alice', lastMove: '2025-08-10' },
-      { id: 'game2', opponent: 'Bob', lastMove: '2025-08-09' }
+      { ID: '1', Opponent: 'Alice', yourTurn: true },
+      { ID: '2', Opponent: 'Bob', yourTurn: true }
     ]);
 
     setLeaderboard([
@@ -52,15 +53,11 @@ const HomePage = () => {
             {myTurnGames.length === 0 ? (
               <p>No games waiting for your move.</p>
             ) : (
-              <ul>
-                {myTurnGames.map((game) => (
-                  <li className='listItem' key={game.id}>
-                    <strong>vs {game.opponent}</strong> — Last move: {game.lastMove}
-                    <button onClick={() => alert(`Open Game ID: ${game.id}`)}>Play</button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                myTurnGames.map((game, index) => (
+                  <div key={index} className="ongoing-game-item">
+                      <GameComponent Game={game} yourTurn={true}/>
+                  </div>
+                )))}
           </section>
         </div>
         <section className="leaderboard">
