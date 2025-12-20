@@ -3,10 +3,12 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const jwt = require('jsonwebtoken')
+const sqlite3 = require('sqlite3').verbose();
 require("dotenv").config()
 
 const app = express();
 app.use(cors());
+const db = new sqlite3.Database('./database/data.db');
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -15,7 +17,7 @@ const io = new Server(server, {
   }
 });
 
-const userConnections = {};
+const userConnections = {1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null, 10: null};
 
 function initLobbyStack(count){
   const tempStack = []
@@ -54,9 +56,14 @@ io.on('connection', (socket) => {
   socket.on("authenticate user", (userID) =>{
     const token = jwt.sign({
       userID: userID
-    }, "aifjhioajfiaj" , { expiresIn: '1h' })
+    }, process.env.JWT_SECRET, { expiresIn: '1h' })
     //sessionStorage.setItem("sessionToken", token)
     io.to(userConnections[userID]).emit("Authenticated", token)
+  })
+
+  socket.on("get users", (RequestUsersName) =>{
+    const keys = Object.keys(userConnections).filter(key => key !== RequestUsersName);
+    io.to(socket.id).emit("active players", keys)
   })
 
   socket.on('sendPlay', (opponentID, senderID, play) => {
@@ -94,7 +101,7 @@ io.on('connection', (socket) => {
   
   })
 
-  socket.on("test", (arg)=>{
+  socket.on("test", ()=>{
     console.log("SI")
   })
 
@@ -112,3 +119,5 @@ const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`Socket.IO server running at http://localhost:${PORT}`);
 });
+
+db.close();

@@ -8,7 +8,8 @@ export default function OnlineUsersComponent(){
         // Simulate fetching online users
         const fetchOnlineUsers = () => {
             // This would be replaced with an actual API call
-            setOnlineUsers(["User1", "User2", "User3"]);
+            const users = ["User1", "User2", "User3"]; // Example data
+            setOnlineUsers(users);
         };
 
         fetchOnlineUsers();
