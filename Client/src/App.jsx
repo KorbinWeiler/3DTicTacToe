@@ -22,12 +22,6 @@ function App() {
   console.log("User: ", user);
   //console.log("Token: ", token);
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected to server with ID: ", socket.id);
-    });
-    socket.emit("test");
-  }, []);
 
   useEffect(() => {
     //const storedToken = sessionStorage.getItem('token');
@@ -35,8 +29,17 @@ function App() {
       console.log("Token Value: " + token)
       sessionStorage.setItem('token', token)
       sessionStorage.setItem('user', JSON.stringify(user));
+
+      socket.connect();
+    }
+
+    if (socket.connected) {
+      return () => {
+        socket.disconnect();
+      }
     }
   }, [token]);
+
 
   return (
     <>
