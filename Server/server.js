@@ -11,6 +11,10 @@ app.use(cors());
 const SECRET = env.JWT_SECRET;
 const users = []; // In-memory user store for demo
 
+app.get('/test', (req, res) => {
+  res.send('Server is running');
+});
+
 // Register
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;

@@ -14,7 +14,7 @@ export default function LoginPage() {
     const { Token, User } = useContext(UserContext);
     const [token, setToken] = Token;
     let user = User
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle login logic here

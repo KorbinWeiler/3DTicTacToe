@@ -13,7 +13,12 @@ import GamesPage from './Pages/GamesPage';
 import PlayGamePage from './Pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
-const socket = io("http://localhost:3000");
+
+const SocketIP = process.env.SERVER_IP + ":" + process.env.SOCKET_PORT;
+
+const socket = io(SocketIP, {
+  autoConnect: false,
+});
 
 function App() {
   sessionStorage.setItem('user', JSON.stringify({name: 'PlayerOne', rank: 5, points: 1200, gameID: '1' }));

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const serverIP = import.meta.env.SERVER_IP
-const serverPort = import.meta.env.SERVER_PORT
+const serverIP = process.env.SERVER_IP
+const serverPort = process.env.PORT
 const url = `http://${serverIP}:${serverPort}`;
 
 const login = async (Username, Password) => {
