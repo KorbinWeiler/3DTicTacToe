@@ -1,11 +1,13 @@
 import axios from 'axios';
 
-const serverIP = process.env.SERVER_IP
-const serverPort = process.env.PORT
+const serverIP = import.meta.env.VITE_SERVER_IP;
+const serverPort = import.meta.env.VITE_SERVER_PORT;
 const url = `http://${serverIP}:${serverPort}`;
+console.log("Auth URL: ", url);
 
 const login = async (Username, Password) => {
     const loginURL = `${url}/login`;
+    console.log("Login URL: ", loginURL);
     const res = await axios.post(loginURL, {
         username: Username,
         password: Password

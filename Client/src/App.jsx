@@ -1,6 +1,6 @@
 import './App.css';
 import LoginPage from './pages/LoginPage.jsx';
-import {BrowserRouter as Router, Routes, Route, redirect} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, redirect, data} from 'react-router-dom'
 import {useState, createContext, useEffect} from 'react'
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
 import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
@@ -14,36 +14,52 @@ import PlayGamePage from './Pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
 
-const SocketIP = process.env.SERVER_IP + ":" + process.env.SOCKET_PORT;
-
-const socket = io(SocketIP, {
-  autoConnect: false,
-});
+const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
+//let socket = io(SocketIP, { autoConnect: false });
 
 function App() {
   sessionStorage.setItem('user', JSON.stringify({name: 'PlayerOne', rank: 5, points: 1200, gameID: '1' }));
   const [token, setToken] = useState(sessionStorage.getItem('token') || '');
   let user = JSON.parse(sessionStorage.getItem('user'));
   console.log("User: ", user);
+  console.log("token", token);
   //console.log("Token: ", token);
 
+  const socket = io(SocketIP, {
+        auth: {
+          token: token,
+          clientID: user.name
+        },
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000
+      });
 
   useEffect(() => {
     //const storedToken = sessionStorage.getItem('token');
-    if (sessionStorage.getItem('token') != token) {
+    if (sessionStorage.getItem('token') != token && token != null){ {
       console.log("Token Value: " + token)
       sessionStorage.setItem('token', token)
       sessionStorage.setItem('user', JSON.stringify(user));
 
-      socket.connect();
-    }
-
-    if (socket.connected) {
-      return () => {
-        socket.disconnect();
+      if(token != null){
+        socket.connect();
       }
+
+      socket.on("emit players", (data) => {
+        console.log("active players: ", data)
+    });
+
+    return () => {
+      if (socket.connected) {
+        socket.off("connect");
+        socket.off("disconnect");
+      }
+    };
     }
-  }, [token]);
+  }
+    
+    }, [token]);
 
 
   return (

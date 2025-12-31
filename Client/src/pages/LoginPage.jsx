@@ -15,15 +15,16 @@ export default function LoginPage() {
     const [token, setToken] = Token;
     let user = User
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         // Handle login logic here
-        const LoginData = mockLogin(username, password);
+        const LoginData = await login(username, password);
+        console.log("Login Data: ", LoginData);
         if (LoginData) {
-            sessionStorage.setItem('user', LoginData.user);
-            sessionStorage.setItem('token', LoginData.token);
-            user = LoginData.user;
-            const newToken = LoginData.token;
+            sessionStorage.setItem('user', username);
+            sessionStorage.setItem('token', LoginData);
+            user = username;
+            const newToken = token;
             setToken(newToken);
             navigate('/');
         }
@@ -63,6 +64,7 @@ export default function LoginPage() {
             <a href='/Register'>Register as a new user</a>
             <a href='/'>Continue as Guest</a>
         </div>
+        <button onClick={() => socket.emit("test")}>testme</button>
         </>
     );
 }
