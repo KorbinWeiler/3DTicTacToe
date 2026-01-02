@@ -3,11 +3,10 @@ import { Navigate } from 'react-router-dom';
 import { UserContext } from '../Utils/UserContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { Token } = useContext(UserContext);
-  const [token, setToken] = Token;
 
   // If there's no token, redirect to login
-  if (!token) {
+  const currentToken = sessionStorage.getItem('token');
+  if (!currentToken) {
     return <Navigate to="/login" replace />;
   }
 

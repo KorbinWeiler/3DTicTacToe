@@ -28,8 +28,6 @@ export default function LoginPage() {
             setToken(newToken);
             navigate('/');
         }
-        console.log('Username:', username);
-        console.log('Password:', password);
     };
     
     return (

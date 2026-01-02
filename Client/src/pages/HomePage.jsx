@@ -12,17 +12,7 @@ const HomePage = () => {
   const [token, setToken] = Token;
   const [myTurnGames, setMyTurnGames] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
-  
-//   useEffect(() => {
-//     // Mock user info fetch
-//     const storedUser = {
-//       name: 'Jane Doe',
-//       email: 'jane.doe@example.com',
-//       role: 'Frontend Developer',
-//     };
 
-//     setUser(storedUser);
-//   }, []);
 
   useEffect(() => {
     // Mock data – replace with API calls
@@ -42,6 +32,7 @@ const HomePage = () => {
   return (
     <div className="homepage">
       <Navbar />
+      <h2>Early Build: To connect to the server manually refresh the page</h2>
       <h1>Welcome, {user.name}!</h1>
       <div className='UserInfo'>
         <div>

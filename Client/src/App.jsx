@@ -13,9 +13,9 @@ import GamesPage from './Pages/GamesPage';
 import PlayGamePage from './Pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
+import { useRef } from 'react';
 
 const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
-//let socket = io(SocketIP, { autoConnect: false });
 
 function App() {
   sessionStorage.setItem('user', JSON.stringify({name: 'PlayerOne', rank: 5, points: 1200, gameID: '1' }));
@@ -23,43 +23,38 @@ function App() {
   let user = JSON.parse(sessionStorage.getItem('user'));
   console.log("User: ", user);
   console.log("token", token);
-  //console.log("Token: ", token);
 
-  const socket = io(SocketIP, {
-        auth: {
-          token: token,
-          clientID: user.name
-        },
-        reconnection: true,
-        reconnectionAttempts: Infinity,
-        reconnectionDelay: 1000
-      });
+  const socket = useRef(null)
 
   useEffect(() => {
-    //const storedToken = sessionStorage.getItem('token');
-    if (sessionStorage.getItem('token') != token && token != null){ {
-      console.log("Token Value: " + token)
-      sessionStorage.setItem('token', token)
-      sessionStorage.setItem('user', JSON.stringify(user));
-
-      if(token != null){
-        socket.connect();
+    if(!token && socket.current){
+      if(socket.current.connected){
+        socket.current.disconnect();
       }
+      return;
+    }
 
-      socket.on("emit players", (data) => {
-        console.log("active players: ", data)
-    });
+
+    if (!socket.current && token) {
+      socket.current = io(SocketIP, {
+        auth: {
+          token: token,
+          clientID: user.name,
+        },
+        autoConnect: false,
+        reconnection: false,
+      });
+
+      socket.current.connect();   
+    }
 
     return () => {
-      if (socket.connected) {
-        socket.off("connect");
-        socket.off("disconnect");
+      if(socket.current){
+        socket.current.disconnect();
+        socket.current = null;
       }
-    };
-    }
-  }
-    
-    }, [token]);
+    }  
+  }, [token]);
 
 
   return (
