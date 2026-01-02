@@ -39,18 +39,16 @@ app.get('/test', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  // db.get(`SELECT password FROM users WHERE username = ${req.body.username}`, [req.body.username], (err, row) => {
-  //   if (err) {
-  //     return res.status(500).json({ error: 'Database error' });
-  //   }
-  //   if (!row || row.password !== req.body.password) {
-  //     return res.status(401).json({ error: 'Invalid credentials' });
-  //   }
-  //   const token = jwt.sign({ username: req.body.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  //   res.json({ token });
-  // });
-  const token = jwt.sign({ username: req.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  res.json({ token });
+  db.get(`SELECT PasswordHash FROM Users WHERE Username = ${req.body.username};`, [req.body.username], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (!row || row.PasswordHash !== req.body.password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ username: req.body.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token: token, user: req.body.username });
+  });
 });
 
 app.listen(process.env.SERVER_PORT, () => console.log('Server running'));

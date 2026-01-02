@@ -21,10 +21,9 @@ export default function LoginPage() {
         const LoginData = await login(username, password);
         console.log("Login Data: ", LoginData);
         if (LoginData) {
-            sessionStorage.setItem('user', username);
-            sessionStorage.setItem('token', LoginData);
-            user = username;
-            const newToken = token;
+            sessionStorage.setItem('user', JSON.stringify(LoginData.user));
+            sessionStorage.setItem('token', LoginData.token);
+            const newToken = LoginData.token;
             setToken(newToken);
             navigate('/');
         }
