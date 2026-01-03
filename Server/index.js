@@ -2,13 +2,20 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { json } = require('stream/consumers');
 const sqlite3 = require('sqlite3').verbose();
 require("dotenv").config()
 
 const app = express();
+app.use(express.json());
 app.use(cors());
-const db = new sqlite3.Database('./database/data.db');
+const db = new sqlite3.Database('./database/data.db', (err) => {
+  if (err) {
+    console.error('Could not connect to database', err);
+  } else {
+    console.log('Connected to database');
+  }});
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -39,15 +46,16 @@ app.get('/test', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  db.get(`SELECT PasswordHash FROM Users WHERE Username = ${req.body.username};`, [req.body.username], (err, row) => {
+  db.get(`SELECT PasswordHash FROM Users WHERE Username = '${req.body.username}';`, (err, row) => {
     if (err) {
+      console.log(err)
       return res.status(500).json({ error: 'Database error' });
     }
     if (!row || row.PasswordHash !== req.body.password) {
       return res.status(401).json({ error: 'Invalid credentials' });
-    }
+    }1
     const token = jwt.sign({ username: req.body.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token: token, user: req.body.username });
+    res.status(200).json({ token: token, user: req.body.username });
   });
 });
 
@@ -137,5 +145,3 @@ io.on('connection', (socket) => {
 server.listen(process.env.SOCKET_PORT, () => {
   console.log(`Socket.IO server running`);
 });
-
-db.close();

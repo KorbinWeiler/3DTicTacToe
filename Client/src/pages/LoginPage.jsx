@@ -21,7 +21,7 @@ export default function LoginPage() {
         const LoginData = await login(username, password);
         console.log("Login Data: ", LoginData);
         if (LoginData) {
-            sessionStorage.setItem('user', JSON.stringify(LoginData.user));
+            sessionStorage.setItem('user', JSON.stringify({ name: LoginData.user, rank: 0, points: 0, gameID: null }));
             sessionStorage.setItem('token', LoginData.token);
             const newToken = LoginData.token;
             setToken(newToken);

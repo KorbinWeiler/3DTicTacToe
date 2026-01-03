@@ -9,6 +9,7 @@ const HomePage = () => {
 
   const { Token, User } = useContext(UserContext);
   const user = User;
+  console.log("User in HomePage: ", user);
   const [token, setToken] = Token;
   const [myTurnGames, setMyTurnGames] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);

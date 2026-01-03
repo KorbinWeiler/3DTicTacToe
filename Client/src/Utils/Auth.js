@@ -8,29 +8,63 @@ console.log("Auth URL: ", url);
 const login = async (Username, Password) => {
     const loginURL = `${url}/login`;
     console.log("Login URL: ", loginURL);
-    const res = await axios.post(loginURL, {
-        username: Username,
-        password: Password
+
+    const res = await fetch(loginURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: Username,
+            password: Password,
+        }),
     });
-    return res.data.token;
+
+    if (!res.ok) {
+        throw new Error(`Login failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
 };
 
 const getProfile = async () => {
     const profileURL = `${url}/profile`;
-    const res = await axios.get(profileURL, {
-        headers: { Authorization: `Bearer ${token}` }
+
+    const res = await fetch(profileURL, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     });
-    return res.data
+
+    if (!res.ok) {
+        throw new Error(`Get profile failed with status ${res.status}`);
+    }
+
+    return res.json();
 };
 
 const registerUser = async (username, email, password) => {
     const registerURL = `${url}/register`;
-    const res = await axios.post(registerURL, {
-        username: username,
-        password: password,
-        email: email
-    })
-    return res.data;
+
+    const res = await fetch(registerURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            email: email,
+        }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Register failed with status ${res.status}`);
+    }
+
+    return res.json();
 };
 
 const mockLogin = (Username, Password) => {

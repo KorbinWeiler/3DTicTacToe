@@ -18,7 +18,6 @@ import { useRef } from 'react';
 const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
 
 function App() {
-  sessionStorage.setItem('user', JSON.stringify({name: 'PlayerOne', rank: 5, points: 1200, gameID: '1' }));
   const [token, setToken] = useState(sessionStorage.getItem('token') || '');
   let user = JSON.parse(sessionStorage.getItem('user'));
   console.log("User: ", user);
@@ -30,6 +29,7 @@ function App() {
     if(!token && socket.current){
       if(socket.current.connected){
         socket.current.disconnect();
+        socket.current = null;
       }
       return;
     }
