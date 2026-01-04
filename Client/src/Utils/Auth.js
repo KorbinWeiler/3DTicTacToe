@@ -7,7 +7,8 @@ console.log("Auth URL: ", url);
 
 const login = async (Username, Password) => {
     const loginURL = `${url}/login`;
-    console.log("Login URL: ", loginURL);
+    const hashedPassword = await hashPassword(Password); 
+    console.log("password: ", hashedPassword);
 
     const res = await fetch(loginURL, {
         method: 'POST',
@@ -16,7 +17,7 @@ const login = async (Username, Password) => {
         },
         body: JSON.stringify({
             username: Username,
-            password: Password,
+            password: hashedPassword,
         }),
     });
 
@@ -47,7 +48,7 @@ const getProfile = async () => {
 
 const registerUser = async (username, email, password) => {
     const registerURL = `${url}/register`;
-    console.log("in /register");
+    const hashedPassword = await hashPassword(password);
     const res = await fetch(registerURL, {
         method: 'POST',
         headers: {
@@ -55,7 +56,7 @@ const registerUser = async (username, email, password) => {
         },
         body: JSON.stringify({
             username: username,
-            password: password,
+            password: hashedPassword,
             email: email,
         }),
     });
@@ -66,6 +67,12 @@ const registerUser = async (username, email, password) => {
 
     return res.json();
 };
+
+async function hashPassword(password) {
+    return await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(password)).then(hashBuffer => {
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    });
+}
 
 const mockLogin = (Username, Password) => {
     // Mock login function for testing purposes
