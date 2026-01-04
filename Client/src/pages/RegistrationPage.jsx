@@ -16,13 +16,16 @@ export default function RegistrationPage() {
     const { Token: [token, setToken] } = useContext(UserContext);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        console.log("hitting", confirmPassword)
         // Handle registration logic here
         try {
-            await registerUser(username, email, password);
+            const res = await registerUser(username, email || "email3@email.com", password);
+            console.log("Registration Response: ", res);
             const newToken = await login(username, password);
             if (newToken) {
-                setToken(newToken);
+                sessionStorage.setItem('user', JSON.stringify({ name: newToken.user, rank: 0, points: 0, gameID: null }));
+                sessionStorage.setItem('token', newToken.token);
+                setToken(newToken.token);
                 navigate('/');
             }
         } catch (error) {
@@ -32,7 +35,10 @@ export default function RegistrationPage() {
 
     return (
         <div className="registration-page">
-            <form className='registration-form' onSubmit={handleSubmit}>
+            <form className='registration-form' onSubmit={(e) => {
+                e.preventDefault();
+                console.log("Submitting");
+                handleSubmit(e)}}>
                 <h2>Register</h2>
                 <div className="input-group">
                     <label htmlFor="username">Username</label>
@@ -41,7 +47,6 @@ export default function RegistrationPage() {
                         id="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        required
                     />
                 </div>
                 <div className="input-group">
@@ -51,7 +56,6 @@ export default function RegistrationPage() {
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
                     />
                 </div>
                 <div className="input-group">
@@ -61,7 +65,6 @@ export default function RegistrationPage() {
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                     />
                 </div>
                 <div className="input-group">
@@ -71,10 +74,11 @@ export default function RegistrationPage() {
                         id="confirm-password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
                     />
                 </div>
-                <button type="submit">Register</button>
+                <button type="submit" onMouseDown={(e) => {
+                    console.log("button mousedown");
+                }}>Register</button>
             </form>
             <a href="/login" className="registration-link">Already have an account? Login</a>
         </div>

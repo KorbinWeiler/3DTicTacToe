@@ -47,7 +47,7 @@ const getProfile = async () => {
 
 const registerUser = async (username, email, password) => {
     const registerURL = `${url}/register`;
-
+    console.log("in /register");
     const res = await fetch(registerURL, {
         method: 'POST',
         headers: {

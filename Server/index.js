@@ -59,6 +59,19 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.post('/register', (req, res) => {
+  const { username, password, email } = req.body;
+  db.run(`DELETE FROM Users WHERE Username = 'test3';`);
+  console.log("Registering user: ", username, email);
+  db.run(`INSERT INTO Users (Username, PasswordHash, Email) VALUES ('${username}', '${password}', '${email}')`, function(err) {
+    if (err) {
+      console.log(err)
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.status(201).json({ message: 'User registered successfully' });
+  });
+});
+
 app.listen(process.env.SERVER_PORT, () => console.log('Server running'));
 
 io.on('connection', (socket) => {

@@ -4,8 +4,8 @@ import {BrowserRouter as Router, Routes, Route, redirect, data} from 'react-rout
 import {useState, createContext, useEffect} from 'react'
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
 import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
-import HomePage from './Pages/HomePage';
-import RegistrationPage from './Pages/RegistrationPage';
+import HomePage from './pages/HomePage';
+import RegistrationPage from './pages/RegistrationPage.jsx';
 import ProfilePage from './Pages/ProfilePage';
 import InvitePage from './Pages/InvitePage';
 import FriendsPage from './Pages/FriendsPage';

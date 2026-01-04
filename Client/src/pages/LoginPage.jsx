@@ -61,7 +61,6 @@ export default function LoginPage() {
             <a href='/Register'>Register as a new user</a>
             <a href='/'>Continue as Guest</a>
         </div>
-        <button onClick={() => socket.emit("test")}>testme</button>
         </>
     );
 }

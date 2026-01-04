@@ -43,7 +43,6 @@
 
 .registration-form button {
   padding: 10px 0;
-  cursor: pointer;
   background: #256029;
   color: #fff;
   border: none;
@@ -58,7 +57,12 @@
 }
 
 .registration-link{
-    padding-top: 40px;
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #256029;
+  text-decoration: none;
+  font-size: 0.9rem;
 }
 
 .registration-error {
