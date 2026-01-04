@@ -17,8 +17,19 @@ export default function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let LoginData = null;
         // Handle login logic here
-        const LoginData = await login(username, password);
+        if (username === '' || password === '') {
+            alert("Please enter both username and password.");
+            return;
+        }
+        try{
+            LoginData = await login(username, password);
+        } catch (error) {
+            console.error('Login failed:', error);
+            alert("Login failed. Please check your credentials and try again.");
+            return;
+        }
         console.log("Login Data: ", LoginData);
         if (LoginData) {
             sessionStorage.setItem('user', JSON.stringify({ name: LoginData.user, rank: 0, points: 0, gameID: null }));

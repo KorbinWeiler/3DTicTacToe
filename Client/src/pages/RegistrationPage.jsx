@@ -19,7 +19,15 @@ export default function RegistrationPage() {
         console.log("hitting", confirmPassword)
         // Handle registration logic here
         try {
-            const res = await registerUser(username, email || "email3@email.com", password);
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return;
+            }
+            if (username === '' || email === '' || password === '') {
+                alert("Please fill in all fields.");
+                return;
+            }
+            const res = await registerUser(username, email, password);
             console.log("Registration Response: ", res);
             const newToken = await login(username, password);
             if (newToken) {
