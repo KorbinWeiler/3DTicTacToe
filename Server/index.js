@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { json } = require('stream/consumers');
+const { callbackify } = require('util');
 const sqlite3 = require('sqlite3').verbose();
 require("dotenv").config()
 
@@ -24,7 +25,7 @@ const io = new Server(server, {
   }
 });
 
-const userConnections = {1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null, 10: null};
+const userConnections = {};
 
 function initLobbyStack(count){
   const tempStack = []
@@ -91,6 +92,7 @@ io.on('connection', (socket) => {
   }
   io.emit("active players", activeUser)
 
+  //I think I can get rid of this because authentication is done using an http request
   socket.on("authenticate user", (userID) =>{
     const token = jwt.sign({
       userID: userID
@@ -99,9 +101,17 @@ io.on('connection', (socket) => {
     io.to(userConnections[userID]).emit("Authenticated", token)
   })
 
-  socket.on("get users", (RequestUsersName) =>{
+  socket.on("get active users", (RequestUsersName, token, callback) =>{
+    console.log("Getting active users for: " + RequestUsersName)
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        console.log("Token verification failed:", err);
+        io.to(socket.id).emit("active players", { error: "Invalid token" });
+        return;
+      }
+    });
     const keys = Object.keys(userConnections).filter(key => key !== RequestUsersName);
-    io.to(socket.id).emit("active players", keys)
+    callback(keys);
   })
 
   socket.on('sendPlay', (opponentID, senderID, play) => {
@@ -116,11 +126,28 @@ io.on('connection', (socket) => {
 
 
   socket.on('invite', (opponentID, senderID) => {
-    io.to(userConnections[opponentID]).emit("game invite", senderID)
+    db.run(`INSERT INTO Invites (FromUser, ToUser, Status) VALUES ('${senderID}', '${opponentID}', 'pending');`, function(err) {
+      if (err) {
+        console.log(err)
+        return;
+      }
+    });
+    io.to(userConnections[opponentID]).emit("update", "invite received");
+  })
+
+  socket.on('get invites', (username, callback) =>{
+    console.log("Fetching invites for: " + username)
+    db.all(`SELECT FromUser FROM Invites WHERE ToUser = '${username}';`, (err, rows) => {
+      if (err) {
+        console.log(err)
+        callback({ error: 'Database error' });
+        return;
+      }
+      callback(rows);
+    });
   })
 
   socket.on("request users", ()=>{
-    console.log("no")
     socket.emit("active players", activeUser)
     // io.to(socket).emit("active players", activeUser)
   })

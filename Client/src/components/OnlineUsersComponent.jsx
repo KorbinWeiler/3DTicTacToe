@@ -1,15 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../Utils/UserContext";
 
 export default function OnlineUsersComponent(){
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [refresh, setRefresh] = useState(0);
+    const {Socket, Token, User} = useContext(UserContext);
+    const [token, ] = Token;
+    const [socket, setSocket] = Socket;
+    const curUser = User;
+
 
     useEffect(() => {
         // Simulate fetching online users
         const fetchOnlineUsers = () => {
             // This would be replaced with an actual API call
-            const users = ["User1", "User2", "User3"]; // Example data
-            setOnlineUsers(users);
+            socket.emit("get active users", User.name, token, (response)=>{
+                if(response.error){
+                    console.log("Error fetching users: ", response.error);
+                    return;
+                }
+                setOnlineUsers(response);
+            }); // Example data
+            //setOnlineUsers(users);
         };
 
         fetchOnlineUsers();
@@ -20,7 +32,7 @@ export default function OnlineUsersComponent(){
             <h2>Online Users</h2>
             {onlineUsers.length > 0 ? 
             onlineUsers.map((user, index) => (
-                <div key={index} className="online-users">
+                <div key={index} onClick={() => socket.emit("invite", user, curUser.name)} className="online-users">
                     {user}
                 </div>
                 )) : 

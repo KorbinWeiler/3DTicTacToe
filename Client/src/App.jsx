@@ -18,25 +18,24 @@ import { useRef } from 'react';
 const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
 
 function App() {
+  const [notifty, setNotify] = useState(false);
   const [token, setToken] = useState(sessionStorage.getItem('token') || '');
   let user = JSON.parse(sessionStorage.getItem('user'));
-  console.log("User: ", user);
-  console.log("token", token);
 
-  const socket = useRef(null)
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if(!token && socket.current){
-      if(socket.current.connected){
-        socket.current.disconnect();
-        socket.current = null;
+    if(!token && socket){
+      if(socket.connected){
+        socket.disconnect();
+        socket = null;
       }
       return;
     }
 
 
-    if (!socket.current && token) {
-      socket.current = io(SocketIP, {
+    if (!socket && token) {
+      const s = io(SocketIP, {
         auth: {
           token: token,
           clientID: user.name,
@@ -45,21 +44,27 @@ function App() {
         reconnection: false,
       });
 
-      socket.current.connect();   
+      s.on("update", (updateType) => {
+        console.log("Received update: " + updateType);
+        // Trigger a refresh in components that depend on this data
+        setNotify(prev => !prev);
+      });
+
+      s.connect();  
+      setSocket(s); 
     }
 
     return () => {
-      if(socket.current){
-        socket.current.disconnect();
-        socket.current = null;
+      if(socket){
+        socket.disconnect();
+        socket = null;
       }
     }  
   }, [token]);
 
-
   return (
     <>
-    <UserContext.Provider value={{Token: [token, setToken], User: user, Socket: socket}}>
+    <UserContext.Provider value={{Token: [token, setToken], User: user, Socket: [socket,setSocket], Refresh: [notifty, setNotify]}}>
       <Router>
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />

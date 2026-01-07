@@ -1,16 +1,34 @@
-import {Children, useState} from 'react';
+import {Children, useState, useContext} from 'react';
 import '../Styles/InvitePage.css';
 import Navbar from "../components/Navbar";
-import InviteComponent from '../Components/InviteComponent';
+import InviteComponent from '../components/InviteComponent';
 import Modal from '../Components/Modal';
+import { UserContext } from "../Utils/UserContext";
+import { useEffect } from 'react';
 
 export default function InvitePage() {
 
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
-    const invites = [
-        { from: 'Alice', date: '2025-08-10' },
-        { from: 'Bob', date: '2025-08-09' }
-    ];
+    const {User, Socket, Refresh} = useContext(UserContext);
+    const [notifty, setNotify] = Refresh;
+    const [socket, setSocket] = Socket;
+    const user = User;
+    const [invites, setInvites] = useState([]);
+    useEffect(() => {
+        // Fetch invites from server
+        if (!socket){
+            return;
+        }
+        socket.emit("get invites", user.name, (response) => {
+            if(response.error){
+                console.log("Error fetching invites: ", response.error);
+                return;
+            }
+            setInvites(response);
+            //setNotify(prev => !prev);
+        });
+    }, [notifty, socket]);
+
     return (
         <div className="invite-page">
             <Navbar />
@@ -24,7 +42,7 @@ export default function InvitePage() {
                 <ul>
                     {invites.map((invite, index) => (
                         <li key={index}>
-                            <strong>From: {invite.from}</strong> — Date: {invite.date}
+                            <strong>From: {invite.FromUser}</strong> — Date: {invite.Date}
                         </li>
                     ))}
                 </ul>
