@@ -126,7 +126,8 @@ io.on('connection', (socket) => {
 
 
   socket.on('invite', (opponentID, senderID) => {
-    db.run(`INSERT INTO Invites (FromUser, ToUser, Status) VALUES ('${senderID}', '${opponentID}', 'pending');`, function(err) {
+    const now = new Date().toISOString();
+    db.run(`INSERT INTO Invites (FromUser, ToUser, DateSent, Status) VALUES ('${senderID}', '${opponentID}', '${now}', 'pending');`, function(err) {
       if (err) {
         console.log(err)
         return;
@@ -137,7 +138,7 @@ io.on('connection', (socket) => {
 
   socket.on('get invites', (username, callback) =>{
     console.log("Fetching invites for: " + username)
-    db.all(`SELECT FromUser FROM Invites WHERE ToUser = '${username}';`, (err, rows) => {
+    db.all(`SELECT FromUser, DateSent FROM Invites WHERE ToUser = '${username}';`, (err, rows) => {
       if (err) {
         console.log(err)
         callback({ error: 'Database error' });

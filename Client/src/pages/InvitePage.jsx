@@ -42,7 +42,7 @@ export default function InvitePage() {
                 <ul>
                     {invites.map((invite, index) => (
                         <li key={index}>
-                            <strong>From: {invite.FromUser}</strong> — Date: {invite.Date}
+                            <strong>From: {invite.FromUser}</strong> — Date: {invite.DateSent}
                         </li>
                     ))}
                 </ul>
