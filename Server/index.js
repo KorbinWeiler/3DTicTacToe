@@ -138,7 +138,7 @@ io.on('connection', (socket) => {
 
   socket.on('get invites', (username, callback) =>{
     console.log("Fetching invites for: " + username)
-    db.all(`SELECT FromUser, DateSent FROM Invites WHERE ToUser = '${username}';`, (err, rows) => {
+    db.all(`SELECT FromUser, DateSent FROM Invites WHERE ToUser = '${username}' and Status = 'pending';`, (err, rows) => {
       if (err) {
         console.log(err)
         callback({ error: 'Database error' });
@@ -153,17 +153,46 @@ io.on('connection', (socket) => {
     // io.to(socket).emit("active players", activeUser)
   })
 
-  socket.on('accept invitation', (opponentID, hostID) =>{
-    // socket.to(userConnections[opponentID]).emit({
-    //   lobbyID: 1,
-    //   yourTurn: true,
-    //   board: null
-    // })
-    console.log("accept invitation")
-    console.log(userConnections[opponentID])
+  socket.on('accept invitation', (opponentID, hostID, date) =>{
     const lobby = getLobbyID();
-    io.to(userConnections[hostID]).emit("add game", lobby, opponentID, hostID)
-    io.to(userConnections[opponentID]).emit("add game", lobby, opponentID, hostID)
+    const blankBoard = [
+      [[null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null]],
+
+      [[null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null]],
+
+      [[null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null]],
+
+      [[null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null]]
+    ];
+    console.log("blank board: ", JSON.stringify(blankBoard))
+    db.run(`UPDATE Invites SET Status = 'accepted' WHERE FromUser = '${hostID}' AND ToUser = '${opponentID}' and DateSent = '${date}';`, function(err) {
+      if (err) {
+        console.log(err)
+        return;
+      }
+    });
+
+    db.run(`INSERT INTO Games (PlayerX , PlayerO, BoardState, CurrentTurn) VALUES ('${hostID}', '${opponentID}', '${JSON.stringify(blankBoard)}', '${hostID}');`, function(err) {
+      if (err) {
+        console.log(err)
+        return;
+      }
+    });
+    
+    io.to(userConnections[hostID]).emit("update", "Game Added")
+    io.to(userConnections[opponentID]).emit("update", "Game Added")
   
   })
 

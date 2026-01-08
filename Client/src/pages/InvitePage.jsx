@@ -1,10 +1,11 @@
-import {Children, useState, useContext} from 'react';
+import {useState, useContext} from 'react';
 import '../Styles/InvitePage.css';
 import Navbar from "../components/Navbar";
 import InviteComponent from '../components/InviteComponent';
 import Modal from '../Components/Modal';
 import { UserContext } from "../Utils/UserContext";
 import { useEffect } from 'react';
+import { AccecptInvitation } from '../Utils/SocketMethods';
 
 export default function InvitePage() {
 
@@ -41,7 +42,7 @@ export default function InvitePage() {
             ) : (
                 <ul>
                     {invites.map((invite, index) => (
-                        <li key={index}>
+                        <li onClick={()=>{AccecptInvitation(socket, user.name, invite.FromUser, invite.DateSent)}} key={index}>
                             <strong>From: {invite.FromUser}</strong> — Date: {invite.DateSent}
                         </li>
                     ))}
