@@ -1,13 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useContext, useState } from "react";
 import GameComponent from "./GameComponent";
+import { UserContext } from "../Utils/UserContext";
 
 export default function OngoingGamesComponent() {
-    let ongoingGames = [{ID: "3", Opponent: "Alice", yourTurn: true}, {ID: "4", Opponent: "Bob", yourTurn: false}]; // This is not a state because the values are not expected to change dynamically in this component.
-
+    const [ongoingGames, setOngoingGames] = useState([]);
+    const { User, Socket, Refresh } = useContext(UserContext);
+    const [socket, setSocket] = Socket;
+    const [notify, setNotify] = Refresh;
+    
     useEffect(() => {
-        // This would be replaced with an actual API call to fetch ongoing games
-        console.log("Fetching ongoing games...");
-    }, []);
+        if (!socket) {
+            return;
+        }
+        socket?.emit("get games", User.name, (response) => {
+            if (response.error) {
+                console.log("Error fetching ongoing games: ", response.error);
+                return;
+            }
+            console.log("Ongoing games fetched: ", response);
+            setOngoingGames(response);
+        });
+    }, [notify, socket]);
 
     return (
         <div className="ongoing-games">
@@ -15,7 +28,7 @@ export default function OngoingGamesComponent() {
             {ongoingGames.length > 0 ? 
                 ongoingGames.map((game, index) => (
                     <div key={index} className="ongoing-game-item">
-                        <GameComponent Game={game} yourTurn={true}/>
+                        <GameComponent Game={game} yourTurn={game.CurrentTurn === User.name}/>
                     </div>
                 )) :
             <p>No ongoing games at the moment.</p>

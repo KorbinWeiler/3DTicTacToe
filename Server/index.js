@@ -124,6 +124,19 @@ io.on('connection', (socket) => {
     })
   })
 
+  socket.on('get games', (username, callback) =>{
+    console.log("Fetching ongoing games for: " + username)
+    db.all(`SELECT GameID, PlayerX, PlayerO, BoardState, CurrentTurn FROM Games WHERE PlayerX = '${username}' OR PlayerO = '${username}' and Winner IS NULL;`, (err, rows) => {
+      if (err) {
+        console.log(err)
+        callback({ error: 'Database error' });
+        return;
+      }
+      callback(rows);
+    }
+    );
+  })
+
 
   socket.on('invite', (opponentID, senderID) => {
     const now = new Date().toISOString();
@@ -154,7 +167,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on('accept invitation', (opponentID, hostID, date) =>{
-    const lobby = getLobbyID();
     const blankBoard = [
       [[null, null, null, null],
       [null, null, null, null],
@@ -184,13 +196,13 @@ io.on('connection', (socket) => {
       }
     });
 
-    db.run(`INSERT INTO Games (PlayerX , PlayerO, BoardState, CurrentTurn) VALUES ('${hostID}', '${opponentID}', '${JSON.stringify(blankBoard)}', '${hostID}');`, function(err) {
+    db.run(`INSERT INTO Games (PlayerX , PlayerO, BoardState, CurrentTurn) VALUES ('${opponentID}', '${hostID}', '${JSON.stringify(blankBoard)}', '${opponentID}');`, function(err) {
       if (err) {
         console.log(err)
         return;
       }
     });
-    
+    console.log("accepted invitation")
     io.to(userConnections[hostID]).emit("update", "Game Added")
     io.to(userConnections[opponentID]).emit("update", "Game Added")
   
