@@ -7,7 +7,7 @@ import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes a
 import HomePage from './pages/HomePage';
 import RegistrationPage from './pages/RegistrationPage.jsx';
 import ProfilePage from './Pages/ProfilePage';
-import InvitePage from './Pages/InvitePage';
+import InvitePage from './pages/InvitePage';
 import FriendsPage from './Pages/FriendsPage';
 import GamesPage from './Pages/GamesPage';
 import PlayGamePage from './Pages/PlayGamePage';
@@ -74,7 +74,7 @@ function App() {
           <Route path="/Invite" element={<ProtectedRoute><InvitePage /></ProtectedRoute>} />
           <Route path="/Friends" element={<ProtectedRoute><FriendsPage /></ProtectedRoute>} />
           <Route path="/Games" element={<ProtectedRoute><GamesPage /></ProtectedRoute>} />
-          <Route path="/Game/:gameID" element={<RestrictedRoute><PlayGamePage /></RestrictedRoute>} />
+          <Route path="/Game/:gameID" element={<ProtectedRoute><PlayGamePage /></ProtectedRoute>} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </Router>
