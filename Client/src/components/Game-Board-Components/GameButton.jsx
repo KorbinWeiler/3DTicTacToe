@@ -10,8 +10,7 @@ export default function GameButton({ x, y, z, value}){
     const {User, Socket} = useContext(UserContext);
     let buttonClass = "game-button";
     const [game, setGame] = useState({});
-    const [boardState, setBoardState] = useState(JSON.parse(sessionStorage.getItem(`board-${gameID}`)).BoardState);
-
+    const [boardState, setBoardState] = useState(JSON.parse(JSON.parse(sessionStorage.getItem(`board-${gameID}`)).BoardState));
     // console.log("Button value:",x, y, z, boardState[z]);
 
     useEffect(() => {

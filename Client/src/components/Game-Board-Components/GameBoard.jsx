@@ -22,7 +22,7 @@ export default function GameBoard({gameID}){
                 console.log("Error fetching game board: ", response.error);
                 return;
             }
-            setBoard(response);
+            setBoard(Array(response));
             sessionStorage.setItem(`board-${gameID}`, JSON.stringify(response));
             // Update the board state here based on response
             // For now, we'll just log it
