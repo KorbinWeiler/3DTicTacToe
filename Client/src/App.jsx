@@ -57,14 +57,14 @@ function App() {
     return () => {
       if(socket){
         socket.disconnect();
-        socket = null;
+        setSocket(null);
       }
     }  
   }, [token]);
 
   return (
     <>
-    <UserContext.Provider value={{Token: [token, setToken], User: user, Socket: [socket,setSocket], Refresh: [notifty, setNotify]}}>
+    <UserContext.Provider value={{Token: [token, setToken], User: user, Socket: socket, Refresh: [notifty, setNotify]}}>
       <Router>
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />

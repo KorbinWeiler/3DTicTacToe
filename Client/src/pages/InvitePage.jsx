@@ -12,15 +12,14 @@ export default function InvitePage() {
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
     const {User, Socket, Refresh} = useContext(UserContext);
     const [notifty, setNotify] = Refresh;
-    const [socket, setSocket] = Socket;
     const user = User;
     const [invites, setInvites] = useState([]);
     useEffect(() => {
         // Fetch invites from server
-        if (!socket){
+        if (!Socket){
             return;
         }
-        socket.emit("get invites", user.name, (response) => {
+        Socket.emit("get invites", user.name, (response) => {
             if(response.error){
                 console.log("Error fetching invites: ", response.error);
                 return;
@@ -28,7 +27,7 @@ export default function InvitePage() {
             setInvites(response);
             //setNotify(prev => !prev);
         });
-    }, [notifty, socket]);
+    }, [notifty, Socket]);
 
     return (
         <div className="invite-page">
@@ -42,7 +41,7 @@ export default function InvitePage() {
             ) : (
                 <ul>
                     {invites.map((invite, index) => (
-                        <li onClick={()=>{AccecptInvitation(socket, user.name, invite.FromUser, invite.DateSent)}} key={index}>
+                        <li onClick={()=>{AccecptInvitation(Socket, user.name, invite.FromUser, invite.DateSent)}} key={index}>
                             <strong>From: {invite.FromUser}</strong> — Date: {invite.DateSent}
                         </li>
                     ))}

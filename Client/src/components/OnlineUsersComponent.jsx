@@ -6,7 +6,6 @@ export default function OnlineUsersComponent(){
     const [refresh, setRefresh] = useState(0);
     const {Socket, Token, User} = useContext(UserContext);
     const [token, ] = Token;
-    const [socket, setSocket] = Socket;
     const curUser = User;
 
 
@@ -14,7 +13,7 @@ export default function OnlineUsersComponent(){
         // Simulate fetching online users
         const fetchOnlineUsers = () => {
             // This would be replaced with an actual API call
-            socket.emit("get active users", User.name, token, (response)=>{
+            Socket.emit("get active users", User.name, token, (response)=>{
                 if(response.error){
                     console.log("Error fetching users: ", response.error);
                     return;
@@ -32,7 +31,7 @@ export default function OnlineUsersComponent(){
             <h2>Online Users</h2>
             {onlineUsers.length > 0 ? 
             onlineUsers.map((user, index) => (
-                <div key={index} onClick={() => socket.emit("invite", user, curUser.name)} className="online-users">
+                <div key={index} onClick={() => Socket.emit("invite", user, curUser.name)} className="online-users">
                     {user}
                 </div>
                 )) : 

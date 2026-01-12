@@ -137,6 +137,18 @@ io.on('connection', (socket) => {
     );
   })
 
+  socket.on('get board', (gameID, callback) =>{
+    console.log("Fetching board for gameID: " + gameID)
+    db.get(`SELECT BoardState FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
+      if (err) {
+        console.log(err)
+        callback({ error: 'Database error' });
+        return;
+      }
+      callback(row);
+    });
+  });
+
 
   socket.on('invite', (opponentID, senderID) => {
     const now = new Date().toISOString();
@@ -168,25 +180,25 @@ io.on('connection', (socket) => {
 
   socket.on('accept invitation', (opponentID, hostID, date) =>{
     const blankBoard = [
-      [[null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null]],
+      [["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"]],
 
-      [[null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null]],
+      [["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"]],
 
-      [[null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null]],
+      [["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"]],
 
-      [[null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null],
-      [null, null, null, null]]
+      [["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"],
+      ["-", "-", "-", "-"]]
     ];
     console.log("blank board: ", JSON.stringify(blankBoard))
     db.run(`UPDATE Invites SET Status = 'accepted' WHERE FromUser = '${hostID}' AND ToUser = '${opponentID}' and DateSent = '${date}';`, function(err) {

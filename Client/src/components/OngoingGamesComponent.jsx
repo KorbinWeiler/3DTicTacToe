@@ -5,14 +5,13 @@ import { UserContext } from "../Utils/UserContext";
 export default function OngoingGamesComponent() {
     const [ongoingGames, setOngoingGames] = useState([]);
     const { User, Socket, Refresh } = useContext(UserContext);
-    const [socket, setSocket] = Socket;
     const [notify, setNotify] = Refresh;
     
     useEffect(() => {
-        if (!socket) {
+        if (!Socket) {
             return;
         }
-        socket?.emit("get games", User.name, (response) => {
+        Socket?.emit("get games", User.name, (response) => {
             if (response.error) {
                 console.log("Error fetching ongoing games: ", response.error);
                 return;
@@ -20,7 +19,7 @@ export default function OngoingGamesComponent() {
             console.log("Ongoing games fetched: ", response);
             setOngoingGames(response);
         });
-    }, [notify, socket]);
+    }, [notify, Socket]);
 
     return (
         <div className="ongoing-games">
