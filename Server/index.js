@@ -220,6 +220,32 @@ io.on('connection', (socket) => {
   
   })
 
+  socket.on("make move", (gameID, token, move, player, opponent, updatedBoardState) =>{
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        console.log("Token verification failed:", err);
+        io.to(socket.id).emit("make move response", { error: "Invalid token" });
+        return;
+      }
+    });
+    db.get(`SELECT PlayerX, PlayerO, CurrentTurn FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
+      if (err) {
+        console.log(err)
+        return;
+      }
+      const player2 = row.PlayerX === player ? row.PlayerO : row.PlayerX;
+      console.log("player2 is " +typeof player2)
+      db.run(`UPDATE Games SET BoardState = '${JSON.stringify(updatedBoardState)}', CurrentTurn = '${player2}' WHERE GameID = '${gameID}';`, function(err) {
+        if (err) {
+          console.log(err)
+          return;
+        }
+      });
+      io.to(userConnections[player]).emit("update", "move made");
+      io.to(userConnections[opponent]).emit("update", "move made");
+    });
+  });
+
   socket.on("test", ()=>{
     console.log("SI")
   })

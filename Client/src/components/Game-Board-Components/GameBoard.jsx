@@ -10,7 +10,8 @@ export default function GameBoard({gameID}){
     // Board is generated in the format [z][x][y] so that each dimension can be easily sent to the GameButton component.
     const [board, setBoard] = useState(null);
     gameID = useParams().gameID
-    const { Socket } = useContext(UserContext);
+    const { Socket, Refresh } = useContext(UserContext);
+    const [notify, setNotify] = Refresh;
 
     useEffect(() => {
         // This would be replaced with an actual API call to fetch the game board based on game
@@ -27,7 +28,7 @@ export default function GameBoard({gameID}){
             // Update the board state here based on response
             // For now, we'll just log it
         });
-    }, [gameID, Socket]);
+    }, [notify,gameID, Socket]);
 
     return board ? 
      (

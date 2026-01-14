@@ -128,3 +128,10 @@
     transition-duration: .5s;
   }
 }
+
+.x{
+    background-color: red;
+}
+.o{
+    background-color: blue;
+}
