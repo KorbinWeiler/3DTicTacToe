@@ -43,7 +43,7 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center">
             <div className="max-w-5xl w-full mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-transparent">
-                    <aside className="hidden md:flex flex-col justify-center gap-6 p-8 rounded-2xl bg-linear-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg">
+                    <aside className="hidden md:flex flex-col justify-center gap-6 p-8 rounded-2xl bg-linear-to-tr from-green-600 via-lime-500 to-green-300 text-white shadow-lg">
                         <h2 className="text-3xl font-extrabold">3D Tic Tac Toe</h2>
                         <p className="text-slate-100/90">Play a modern 3D take on the classic game. Sign in to track progress, play online, and challenge friends.</p>
                         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-40 opacity-90">
