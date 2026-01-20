@@ -28,7 +28,7 @@ function App() {
     if(!token && socket){
       if(socket.connected){
         socket.disconnect();
-        socket = null;
+        setSocket(null);
       }
       return;
     }
