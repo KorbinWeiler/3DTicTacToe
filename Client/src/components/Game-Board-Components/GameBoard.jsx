@@ -1,44 +1,74 @@
 import { useEffect, createContext, useContext, useState } from "react";
 import GameBoardDimension from "./GameBoardDimension";
-import "../../Styles/ComponentStyles.css";
 import { UserContext } from "../../Utils/UserContext";
 import { useParams } from "react-router-dom";
 
 export const GameIDContext = createContext();
 
-export default function GameBoard({gameID}){
-    // Board is generated in the format [z][x][y] so that each dimension can be easily sent to the GameButton component.
+export default function GameBoard({ gameID }){
+    // Board shape: [z][x][y]
     const [board, setBoard] = useState(null);
-    gameID = useParams().gameID
+    const params = useParams();
+    gameID = gameID || params.gameID;
     const { Socket, Refresh } = useContext(UserContext);
-    const [notify, setNotify] = Refresh;
+    const [notify] = Refresh;
 
     useEffect(() => {
-        // This would be replaced with an actual API call to fetch the game board based on game
-        if (!Socket) {
-            return;
-        }
-        Socket?.emit("get board", gameID, (response) => {
-            if (response.error) {
+        if (!Socket || !gameID) return;
+        Socket.emit("get board", gameID, (response) => {
+            if (response?.error) {
                 console.log("Error fetching game board: ", response.error);
                 return;
             }
-            setBoard(Array(response));
-            sessionStorage.setItem(`board-${gameID}`, JSON.stringify(response));
-            // Update the board state here based on response
-            // For now, we'll just log it
-        });
-    }, [notify,gameID, Socket]);
+            // Safely normalize response into an array of dimensions without deep recursion
+            function normalizeToArray(data) {
+                if (data == null) return null;
+                // If it's a JSON string, try to parse it
+                if (typeof data === 'string') {
+                    try {
+                        const parsed = JSON.parse(data);
+                        return normalizeToArray(parsed);
+                    } catch (e) {
+                        return null;
+                    }
+                }
 
-    return board ? 
-     (
-        <div className="game-board">
+                if (Array.isArray(data)) return data;
+                if (data.BoardState) return normalizeToArray(data.BoardState);
+
+                // If object has numeric keys at top level, map them to an array (one level deep)
+                const topKeys = Object.keys(data).filter(k => /^\d+$/.test(k)).sort((a,b) => Number(a)-Number(b));
+                if (topKeys.length) {
+                    return topKeys.map(k => {
+                        const v = data[k];
+                        // If value is a JSON string or an object/array, normalize it
+                        return normalizeToArray(v);
+                    });
+                }
+
+                return null;
+            }
+
+            const boardArray = normalizeToArray(response) ?? normalizeToArray(response?.BoardState) ?? null;
+            if (!boardArray) console.log('Unable to normalize board response:', response);
+            setBoard(boardArray);
+            try { sessionStorage.setItem(`board-${gameID}`, JSON.stringify({ BoardState: boardArray })); } catch (e) {}
+        });
+    }, [notify, gameID, Socket]);
+
+    if (!board) return <p className="text-sm text-slate-500">Loading board...</p>;
+    console.log("Rendering board: ", board);
+
+    return (
+        <div className="game-board space-y-6">
             <GameIDContext.Provider value={gameID}>
-                <GameBoardDimension z={0} boardDimension={board[0]}/>
-                <GameBoardDimension z={1} boardDimension={board[1]}/>
-                <GameBoardDimension z={2} boardDimension={board[2]}/>
-                <GameBoardDimension z={3} boardDimension={board[3]}/>
+                {(Array.isArray(board) ? board : board?.BoardState ?? []).map((dim, z) => (
+                    <div key={z} className="">
+                        <div className="mb-2 text-sm text-slate-600 dark:text-slate-300">Level {z + 1}</div>
+                        <GameBoardDimension z={z} boardDimension={dim} />
+                    </div>
+                ))}
             </GameIDContext.Provider>
         </div>
-    ) : <p>Loading board...</p>;
+    );
 }

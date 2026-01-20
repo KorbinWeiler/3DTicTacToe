@@ -132,10 +132,24 @@ io.on('connection', (socket) => {
         callback({ error: 'Database error' });
         return;
       }
+  
       callback(rows);
     }
     );
   })
+
+  socket.on('get game', (gameID, callback) =>{
+    console.log("Fetching game for gameID: " + gameID)
+    db.get(`SELECT * FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
+      if (err) {
+        console.log(err)
+        callback({ error: 'Database error' });
+        return;
+      }
+      console.log("game data: ", row)
+      callback(row);
+    });
+  });
 
   socket.on('get board', (gameID, callback) =>{
     console.log("Fetching board for gameID: " + gameID)
@@ -145,6 +159,7 @@ io.on('connection', (socket) => {
         callback({ error: 'Database error' });
         return;
       }
+      console.log("Ongoing games: ", row)
       callback(row);
     });
   });
