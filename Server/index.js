@@ -5,6 +5,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { json } = require('stream/consumers');
 const { callbackify } = require('util');
+const { InitializeBlankBoard } = require('./utils/GameUtils');
 const sqlite3 = require('sqlite3').verbose();
 require("dotenv").config()
 
@@ -194,27 +195,8 @@ io.on('connection', (socket) => {
   })
 
   socket.on('accept invitation', (opponentID, hostID, date) =>{
-    const blankBoard = [
-      [["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"]],
-
-      [["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"]],
-
-      [["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"]],
-
-      [["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"],
-      ["-", "-", "-", "-"]]
-    ];
+    const blankBoard = InitializeBlankBoard();
+    
     console.log("blank board: ", JSON.stringify(blankBoard))
     db.run(`UPDATE Invites SET Status = 'accepted' WHERE FromUser = '${hostID}' AND ToUser = '${opponentID}' and DateSent = '${date}';`, function(err) {
       if (err) {
