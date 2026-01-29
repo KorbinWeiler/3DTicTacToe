@@ -9,7 +9,8 @@ export default function GameBoard({ gameID }){
     // Board shape: [z][x][y]
     const [board, setBoard] = useState(null);
     const params = useParams();
-    gameID = gameID || params.gameID;
+    const [winner, setWinner] = useState(null);
+    gameID = params.gameID;
     const { Socket, Refresh } = useContext(UserContext);
     const [notify] = Refresh;
 
@@ -17,9 +18,11 @@ export default function GameBoard({ gameID }){
         if (!Socket || !gameID) return;
         Socket.emit("get board", gameID, (response) => {
             if (response?.error) {
-                console.log("Error fetching game board: ", response.error);
+                console.error("Error fetching game board: ", response.error);
                 return;
             }
+
+            //what the actual fuck is this?????
             // Safely normalize response into an array of dimensions without deep recursion
             function normalizeToArray(data) {
                 if (data == null) return null;
@@ -50,17 +53,25 @@ export default function GameBoard({ gameID }){
             }
 
             const boardArray = normalizeToArray(response) ?? normalizeToArray(response?.BoardState) ?? null;
-            if (!boardArray) console.log('Unable to normalize board response:', response);
+            if (!boardArray) console.error('Unable to normalize board response:', response);
             setBoard(boardArray);
             try { sessionStorage.setItem(`board-${gameID}`, JSON.stringify({ BoardState: boardArray })); } catch (e) {}
+            Socket.emit("get winner", gameID, (winResponse) => {
+                if (winResponse?.error) {
+                    console.error("Error fetching game winner: ", winResponse.error);
+                    return;
+                }
+                setWinner(winResponse.Winner || null);
+            });
         });
     }, [notify, gameID, Socket]);
 
     if (!board) return <p className="text-sm text-slate-500">Loading board...</p>;
-    console.log("Rendering board: ", board);
-
     return (
         <div className="game-board space-y-6">
+            {winner ? <div className="mb-4 p-4 bg-green-100 text-green-800 rounded">
+                <strong>Game Over!</strong> Winner: {winner}
+            </div> : null}
             <GameIDContext.Provider value={gameID}>
                 {(Array.isArray(board) ? board : board?.BoardState ?? []).map((dim, z) => (
                     <div key={z} className="">

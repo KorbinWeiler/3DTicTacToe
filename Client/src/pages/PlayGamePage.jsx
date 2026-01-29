@@ -1,10 +1,10 @@
-import { useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import GameBoard from "../Components/Game-Board-Components/GameBoard";
 import Navbar from "../components/Navbar";
 
 export default function PlayGamePage() {
-    const [searchParams] = useSearchParams();
-    const gameID = searchParams.get("gameID");
+    const params = useParams();
+    const gameID = params.gameID;
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">

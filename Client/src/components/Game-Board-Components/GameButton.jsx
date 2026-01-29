@@ -37,6 +37,9 @@ export default function GameButton({ x, y, z, value }){
     function handleClick() {
         if (!Socket || !game) return;
         if (cell && cell !== '-') return; // already taken
+        if (game.Winner){
+            return
+        };
         if (game.CurrentTurn !== User.name){
             return
         }; // not your turn

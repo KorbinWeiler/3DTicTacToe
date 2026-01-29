@@ -5,9 +5,10 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { json } = require('stream/consumers');
 const { callbackify } = require('util');
-const { InitializeBlankBoard } = require('./utils/GameUtils');
+const { InitializeBlankBoard, CheckWin } = require('./utils/GameUtils');
 const sqlite3 = require('sqlite3').verbose();
 require("dotenv").config()
+
 
 const app = express();
 app.use(express.json());
@@ -238,14 +239,32 @@ io.on('connection', (socket) => {
           return;
         }
       });
+
+      if (CheckWin(move.x, move.y, move.z, updatedBoardState, player ? 'X' : 'O')){
+        console.log("Player " + player + " wins!")
+        db.run(`UPDATE Games SET Winner = '${player}' WHERE GameID = '${gameID}';`, function(err) {
+          if (err) {
+            console.log(err)
+            return;
+          }
+        });
+      }
       io.to(userConnections[player]).emit("update", "move made");
       io.to(userConnections[opponent]).emit("update", "move made");
     });
   });
 
-  socket.on("test", ()=>{
-    console.log("SI")
-  })
+  socket.on("get winner", (gameID, callback) =>{
+    db.get(`SELECT Winner FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
+      if (err) {
+        console.log(err)
+        callback({ error: 'Database error' });
+        return;
+      }
+      console.log("Winner data: ", row)
+      callback(row);
+    });
+  });
 
   socket.on("decline invitation", ({recieverID, invite})=>{
     console.log("declined invitation")
