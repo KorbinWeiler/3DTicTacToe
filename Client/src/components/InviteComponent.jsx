@@ -15,7 +15,7 @@ export default function InviteComponent() {
                 <button className="state-button" onClick={() => setSearchBool(true)}>Search User</button>
                 <button className="state-button selected" onClick={() => setSearchBool(false)}>Online Users</button>
             </div>}
-            {searchBool ? <SearchUserComponent/> : <OnlineUsersComponent/>}
+            {searchBool ? <OnlineUsersComponent/> : <SearchUserComponent/>}
         </>
     )
 }

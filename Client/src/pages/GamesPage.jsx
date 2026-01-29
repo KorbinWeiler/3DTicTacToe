@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import OngoingGamesComponent from "../Components/OngoingGamesComponent";
-import GameHistoryComponent from "../Components/GameHistoryComponent";
+import GameHistoryComponent from "../components/GameHistoryComponent";
 
 export default function GamesPage() {
 

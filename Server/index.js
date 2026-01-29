@@ -104,7 +104,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on("get active users", (RequestUsersName, token, callback) =>{
-    console.log("Getting active users for: " + RequestUsersName)
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         console.log("Token verification failed:", err);
@@ -117,8 +116,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on('sendPlay', (opponentID, senderID, play) => {
-    console.log("Play: " + play)
-    console.log("ID: " + opponentID)
     //send the play back to the player again
     io.to(userConnections[senderID]).emit("replay play", play)
     socket.to(userConnections[opponentID]).emit("recieve play", {
@@ -127,7 +124,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on('get games', (username, callback) =>{
-    console.log("Fetching ongoing games for: " + username)
     db.all(`SELECT GameID, PlayerX, PlayerO, BoardState, CurrentTurn FROM Games WHERE PlayerX = '${username}' OR PlayerO = '${username}' and Winner IS NULL;`, (err, rows) => {
       if (err) {
         console.log(err)
@@ -141,7 +137,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on('get game', (gameID, callback) =>{
-    console.log("Fetching game for gameID: " + gameID)
     db.get(`SELECT * FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
       if (err) {
         console.log(err)
@@ -179,7 +174,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on('get invites', (username, callback) =>{
-    console.log("Fetching invites for: " + username)
     db.all(`SELECT FromUser, DateSent FROM Invites WHERE ToUser = '${username}' and Status = 'pending';`, (err, rows) => {
       if (err) {
         console.log(err)
@@ -197,8 +191,6 @@ io.on('connection', (socket) => {
 
   socket.on('accept invitation', (opponentID, hostID, date) =>{
     const blankBoard = InitializeBlankBoard();
-    
-    console.log("blank board: ", JSON.stringify(blankBoard))
     db.run(`UPDATE Invites SET Status = 'accepted' WHERE FromUser = '${hostID}' AND ToUser = '${opponentID}' and DateSent = '${date}';`, function(err) {
       if (err) {
         console.log(err)
@@ -212,7 +204,6 @@ io.on('connection', (socket) => {
         return;
       }
     });
-    console.log("accepted invitation")
     io.to(userConnections[hostID]).emit("update", "Game Added")
     io.to(userConnections[opponentID]).emit("update", "Game Added")
   
@@ -232,7 +223,6 @@ io.on('connection', (socket) => {
         return;
       }
       const player2 = row.PlayerX === player ? row.PlayerO : row.PlayerX;
-      console.log("player2 is " +typeof player2)
       db.run(`UPDATE Games SET BoardState = '${JSON.stringify(updatedBoardState)}', CurrentTurn = '${player2}' WHERE GameID = '${gameID}';`, function(err) {
         if (err) {
           console.log(err)
@@ -241,7 +231,6 @@ io.on('connection', (socket) => {
       });
 
       if (CheckWin(move.x, move.y, move.z, updatedBoardState, player ? 'X' : 'O')){
-        console.log("Player " + player + " wins!")
         db.run(`UPDATE Games SET Winner = '${player}' WHERE GameID = '${gameID}';`, function(err) {
           if (err) {
             console.log(err)
