@@ -271,6 +271,18 @@ io.on('connection', (socket) => {
     socket.to(userConnections[invite]).emit("invitation declined", recieverID);
   })
 
+  socket.on("get game history", (username, callback) =>{
+    console.log("Fetching game history for: " + username)
+    db.all(`SELECT GameID, PlayerX, PlayerO, Winner FROM Games WHERE (PlayerX = '${username}' OR PlayerO = '${username}') AND Winner IS NOT NULL;`, (err, rows) => {
+      if (err) {
+        console.log(err)
+        callback({ error: 'Database error' });
+        return;
+      }
+      callback(rows);
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log(`Client disconnected: ${socket.id}`);
     delete userConnections[userID];

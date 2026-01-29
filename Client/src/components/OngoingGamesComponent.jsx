@@ -1,6 +1,6 @@
 import { useEffect, useContext, useState } from "react";
-import GameComponent from "./GameComponent";
 import { UserContext } from "../Utils/UserContext";
+import GameComponent from "../components/GameComponent";
 
 export default function OngoingGamesComponent() {
     const [ongoingGames, setOngoingGames] = useState([]);
