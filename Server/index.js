@@ -62,6 +62,15 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.get('/guestLogin', (req, res) => {
+  let guestUsername = `Guest${Math.floor(Math.random() * 1000000000)}`;
+  while (guestUsername in userConnections){
+    guestUsername = `Guest${Math.floor(Math.random() * 1000000000)}`;
+  }
+  const token = jwt.sign({ username: guestUsername }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  res.status(200).json({ token: token, user: guestUsername });
+}); 
+
 app.post('/register', (req, res) => {
   const { username, password, email } = req.body;
   db.run(`DELETE FROM Users WHERE Username = 'test3';`);

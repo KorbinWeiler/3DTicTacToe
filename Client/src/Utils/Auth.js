@@ -73,6 +73,15 @@ async function hashPassword(password) {
     });
 }
 
+async function LoginAsGuest(){
+    const guestLoginURL = `${url}/guestLogin`;
+    const res = await fetch(guestLoginURL);
+    if (!res.ok) {
+        throw new Error(`Guest login failed with status ${res.status}`);
+    }
+    return res.json();
+}
+
 const mockLogin = (Username, Password) => {
     // Mock login function for testing purposes
     if (Username === 'test' && Password === 'password') {
@@ -83,4 +92,4 @@ const mockLogin = (Username, Password) => {
     }
 }
 
-export { login, getProfile, registerUser, mockLogin }
+export { login, getProfile, registerUser, mockLogin, LoginAsGuest }

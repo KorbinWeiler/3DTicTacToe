@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import {login, mockLogin} from '../Utils/Auth';
+import {login, LoginAsGuest} from '../Utils/Auth';
 import {UserContext} from '../Utils/UserContext'
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -30,6 +30,25 @@ export default function LoginPage() {
             return;
         }
         console.log("Login Data: ", LoginData);
+        if (LoginData) {
+            sessionStorage.setItem('user', JSON.stringify({ name: LoginData.user, rank: 0, points: 0, gameID: null }));
+            sessionStorage.setItem('token', LoginData.token);
+            const newToken = LoginData.token;
+            setToken(newToken);
+            navigate('/');
+        }
+    };
+
+    const GuestLogin = async (e) => {
+        e.preventDefault();
+        let LoginData = null;
+        try{
+            LoginData = await LoginAsGuest();
+        } catch (error) {
+            console.error('Guest Login failed:', error.message);
+            alert("Guest Login failed. Please try again.");
+            return;
+        }
         if (LoginData) {
             sessionStorage.setItem('user', JSON.stringify({ name: LoginData.user, rank: 0, points: 0, gameID: null }));
             sessionStorage.setItem('token', LoginData.token);
@@ -111,7 +130,7 @@ export default function LoginPage() {
                             </div>
 
                             <div className="mt-4">
-                                <button className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">Guest</button>
+                                <button onClick={GuestLogin} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">Guest</button>
                             </div>
                         </div>
 
