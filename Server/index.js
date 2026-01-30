@@ -218,37 +218,59 @@ io.on('connection', (socket) => {
   
   })
 
-  socket.on("make move", (gameID, token, move, player, opponent, updatedBoardState) =>{
+  socket.on("make move", (gameID, token, move, player, updatedBoardState, ack) =>{
+    console.log("updata ", updatedBoardState);
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         console.log("Token verification failed:", err);
-        io.to(socket.id).emit("make move response", { error: "Invalid token" });
+        if (typeof ack === 'function') ack({ error: "Invalid token" });
         return;
       }
     });
+
     db.get(`SELECT PlayerX, PlayerO, CurrentTurn FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
       if (err) {
         console.log(err)
+        if (typeof ack === 'function') ack({ error: 'Database error' });
         return;
       }
-      const player2 = row.PlayerX === player ? row.PlayerO : row.PlayerX;
-      db.run(`UPDATE Games SET BoardState = '${JSON.stringify(updatedBoardState)}', CurrentTurn = '${player2}' WHERE GameID = '${gameID}';`, function(err) {
+
+      const nextTurn = row.PlayerX === player ? row.PlayerO : row.PlayerX;
+      const opponentID = row.PlayerX === player ? row.PlayerO : row.PlayerX;
+
+      // Accept either a parsed board (array) or a JSON string. Use parameterized queries
+      // to avoid double-stringifying and SQL injection.
+      const boardString = (typeof updatedBoardState === 'string') ? updatedBoardState : JSON.stringify(updatedBoardState);
+      db.run(`UPDATE Games SET BoardState = ?, CurrentTurn = ? WHERE GameID = ?;`, [boardString, nextTurn, gameID], function(err) {
         if (err) {
           console.log(err)
+          if (typeof ack === 'function') ack({ error: 'Database error' });
           return;
         }
       });
 
-      if (CheckWin(move.x, move.y, move.z, updatedBoardState, player ? 'X' : 'O')){
-        db.run(`UPDATE Games SET Winner = '${player}' WHERE GameID = '${gameID}';`, function(err) {
+      // Parse board for win checking if needed
+      let boardForCheck = updatedBoardState;
+      try {
+        if (typeof updatedBoardState === 'string') boardForCheck = JSON.parse(updatedBoardState);
+      } catch (e) {
+        console.log('Failed to parse updatedBoardState for win check:', e);
+        boardForCheck = updatedBoardState;
+      }
+
+      const playerSymbol = row.PlayerX === player ? 'X' : 'O';
+      if (CheckWin(move.x, move.y, move.z, boardForCheck, playerSymbol)){
+        db.run(`UPDATE Games SET Winner = ? WHERE GameID = ?;`, [player, gameID], function(err) {
           if (err) {
             console.log(err)
-            return;
           }
         });
       }
-      io.to(userConnections[player]).emit("update", "move made");
-      io.to(userConnections[opponent]).emit("update", "move made");
+
+      if (userConnections[player]) io.to(userConnections[player]).emit("update", "move made");
+      if (userConnections[opponentID]) io.to(userConnections[opponentID]).emit("update", "move made");
+
+      if (typeof ack === 'function') ack({ ok: true });
     });
   });
 

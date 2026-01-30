@@ -1,6 +1,8 @@
 import { useState, useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../Utils/UserContext";
+import { localFunctions } from "../../Utils/LocalGameUtils";
+import { functions } from "../../Utils/GameUtils";
 
 export default function GameButton({ x, y, z, value }){
     const gameID = useParams().gameID;
@@ -9,19 +11,25 @@ export default function GameButton({ x, y, z, value }){
     const [token] = Token;
     const [cell, setCell] = useState(value ?? '-');
     const [game, setGame] = useState(null);
+    const activeFuncs = (gameID && gameID.startsWith("localgame-")) ? localFunctions : functions;
 
     useEffect(() => {
         if (!Socket){
             console.log("failed")
             return;
         }
-        Socket.emit("get game", gameID, (response) => {
-            if (response?.error) {
-                console.log("Error fetching game data: ", response.error);
-                return;
+        let mounted = true;
+        (async () => {
+            try {
+                const gameData = await activeFuncs.getGame(gameID, Socket);
+                if (!mounted) return;
+                if (gameData) setGame(gameData);
+                else console.error("Error fetching game data");
+            } catch (err) {
+                console.error("Error fetching game data:", err);
             }
-            setGame(response);
-        });
+        })();
+        return () => { mounted = false; };
     }, [notify, Socket]);
 
     // Keep local `cell` in sync with incoming `value` prop (board updates)
@@ -35,40 +43,52 @@ export default function GameButton({ x, y, z, value }){
     const emptyClasses = "bg-white hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer";
 
     function handleClick() {
-        if (!Socket || !game) return;
-        if (cell && cell !== '-') return; // already taken
+        if (!Socket || !game){ 
+            console.log("no socket or game");
+            return;
+        }
+        if (cell && cell !== '-') {
+            console.log("cell already taken");
+            return; // already taken
+        }
         if (game.Winner){
+            console.log("game already won");
             return
         };
         if (game.CurrentTurn !== User.name){
+            console.log(game.CurrentTurn, User.name);
+            console.log("not your turn");
             return
         }; // not your turn
 
         const symbol = User?.name === game.PlayerX ? 'X' : 'O';
 
-        // try to update sessionStorage board if present
-        try {
-            const raw = sessionStorage.getItem(`board-${gameID}`);
-            console.log(raw)
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                const boardState = parsed?.BoardState ?? parsed;
-                if (boardState && boardState[z] && boardState[z][x]) {
-                    boardState[z][y][x] = symbol;
-                    sessionStorage.setItem(`board-${gameID}`, JSON.stringify({ BoardState: boardState }));
-                    Socket.emit("make move", gameID, token, { x, y, z }, User.name, User.name === game.PlayerX ? game.PlayerO : game.PlayerX, boardState);
-                    setCell(symbol);
-                }
-            } else {
-                // no board in storage — still send move
-                Socket.emit("make move", gameID, token, { x, y, z }, User.name, User.name === game.PlayerX ? game.PlayerO : game.PlayerX, null);
-                setCell(symbol);
-            }
-        } catch (e) {
-            console.log('Failed to update board in storage', e);
-            Socket.emit("make move", gameID, token, { x, y, z }, User.name, User.name === game.PlayerX ? game.PlayerO : game.PlayerX, null);
-            setCell(symbol);
+        // Prepare board payload: ensure it's a parsed 3D array and apply the move
+        const parsedBoard = (typeof game.BoardState === 'string') ? JSON.parse(game.BoardState) : game.BoardState;
+        if (!Array.isArray(parsedBoard)) {
+            console.error('Invalid board payload, cannot make move');
+            return;
         }
+        const updatedBoard = JSON.parse(JSON.stringify(parsedBoard));
+        if (!updatedBoard[z] || !updatedBoard[z][y] || typeof updatedBoard[z][y][x] === 'undefined'){
+            console.error('Board dimensions incorrect for move', { x, y, z });
+            return;
+        }
+        updatedBoard[z][y][x] = symbol;
+
+        // Send updated board to server and await acknowledgement
+        (async () => {
+            try {
+                const res = await activeFuncs.makeMove(gameID, token, { x, y, z }, User.name, updatedBoard, Socket);
+                if (!res) console.warn('No ack from makeMove');
+            } catch (err) {
+                console.error('makeMove failed:', err);
+            }
+        })();
+
+        // Update local cell state optimistically and update local game object
+        setCell(symbol);
+        setGame(prev => prev ? { ...prev, BoardState: updatedBoard } : prev);
     }
 
     const computedClasses = `${baseClasses} ${cell === 'X' ? xClasses : cell === 'O' ? oClasses : emptyClasses}`;

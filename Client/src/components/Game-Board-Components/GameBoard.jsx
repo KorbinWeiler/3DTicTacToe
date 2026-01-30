@@ -2,6 +2,8 @@ import { useEffect, createContext, useContext, useState } from "react";
 import GameBoardDimension from "./GameBoardDimension";
 import { UserContext } from "../../Utils/UserContext";
 import { useParams } from "react-router-dom";
+import { localFunctions } from "../../Utils/LocalGameUtils";
+import { functions } from "../../Utils/GameUtils";
 
 export const GameIDContext = createContext();
 
@@ -15,56 +17,61 @@ export default function GameBoard({ gameID }){
     const [notify] = Refresh;
 
     useEffect(() => {
-        if (!Socket || !gameID) return;
-        Socket.emit("get board", gameID, (response) => {
-            if (response?.error) {
-                console.error("Error fetching game board: ", response.error);
-                return;
-            }
+        if (!Socket || !gameID) return; //local games dont work without online connection for now
+        // Socket.emit("get board", gameID, (response) => {
+        //     if (response?.error) {
+        //         console.error("Error fetching game board: ", response.error);
+        //         return;
+        //     }         
 
-            //what the actual fuck is this?????
-            // Safely normalize response into an array of dimensions without deep recursion
-            function normalizeToArray(data) {
-                if (data == null) return null;
-                // If it's a JSON string, try to parse it
-                if (typeof data === 'string') {
-                    try {
-                        const parsed = JSON.parse(data);
-                        return normalizeToArray(parsed);
-                    } catch (e) {
-                        return null;
-                    }
-                }
+        //     const boardArray = normalizeToArray(response) ?? normalizeToArray(response?.BoardState) ?? null;
+        //     if (!boardArray) console.error('Unable to normalize board response:', response);
+        //     setBoard(boardArray);
+        //     try { sessionStorage.setItem(`board-${gameID}`, JSON.stringify({ BoardState: boardArray })); } catch (e) {}
+        //     Socket.emit("get winner", gameID, (winResponse) => {
+        //         if (winResponse?.error) {
+        //             console.error("Error fetching game winner: ", winResponse.error);
+        //             return;
+        //         }
+        //         setWinner(winResponse.Winner || null);
+        //     });
+        // });
+        const activeFuncs = (gameID && gameID.startsWith("localgame-")) ? localFunctions : functions;
 
-                if (Array.isArray(data)) return data;
-                if (data.BoardState) return normalizeToArray(data.BoardState);
 
-                // If object has numeric keys at top level, map them to an array (one level deep)
-                const topKeys = Object.keys(data).filter(k => /^\d+$/.test(k)).sort((a,b) => Number(a)-Number(b));
-                if (topKeys.length) {
-                    return topKeys.map(k => {
-                        const v = data[k];
-                        // If value is a JSON string or an object/array, normalize it
-                        return normalizeToArray(v);
-                    });
-                }
+        // const boardData = funcs.getBoard(gameID, Socket);
+        // console.log("board data:", boardData);
+        // if (boardData){
+        //     setBoard(boardData);
+        // }
+        // else{
+        //     console.error("Error fetching game board");
+        // }
+        // const winnerData = funcs.getWinner(gameID, Socket);
+        // if (winnerData){
+        //     setWinner(winnerData);
+        // }
+        // else{
+        //     console.error("Error fetching game winner");
+        // }
+    let mounted = true;
+    (async () => {
+        try {
+            const boardData = await activeFuncs.getBoard(gameID, Socket);
+            if (!mounted) return;
+            if (boardData) setBoard(boardData);
+            else console.error("Error fetching game board");
 
-                return null;
-            }
+            const winnerData = await activeFuncs.getWinner(gameID, Socket);
+            if (!mounted) return;
+            setWinner(winnerData ?? null);
+        } catch (err) {
+            console.error("Error fetching game data:", err);
+        }
 
-            const boardArray = normalizeToArray(response) ?? normalizeToArray(response?.BoardState) ?? null;
-            if (!boardArray) console.error('Unable to normalize board response:', response);
-            setBoard(boardArray);
-            try { sessionStorage.setItem(`board-${gameID}`, JSON.stringify({ BoardState: boardArray })); } catch (e) {}
-            Socket.emit("get winner", gameID, (winResponse) => {
-                if (winResponse?.error) {
-                    console.error("Error fetching game winner: ", winResponse.error);
-                    return;
-                }
-                setWinner(winResponse.Winner || null);
-            });
-        });
-    }, [notify, gameID, Socket]);
+    })();
+    return () => { mounted = false; };
+}, [notify, gameID, Socket]);
 
     if (!board) return <p className="text-sm text-slate-500">Loading board...</p>;
     return (

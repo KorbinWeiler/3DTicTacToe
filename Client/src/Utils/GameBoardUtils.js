@@ -1,111 +1,44 @@
-import BoardUtils from "./BoardUtils";
-
-class GameBoardUtils{
-    constructor(){
-        this.boards = []
-        for (let z = 0; z < 4; ++z){
-            this.boards[z] = new BoardUtils(z);
+function normalizeToArray(data) {
+    if (data == null) return null;
+    // If it's a JSON string, try to parse it
+    if (typeof data === 'string') {
+        try {
+            const parsed = JSON.parse(data);
+            return normalizeToArray(parsed);
+        } catch (e) {
+            // If it's a plain string value (e.g. "-" without JSON structure), return it as-is
+            return data;
         }
     }
 
-    getTile(x,y,z){
-        return this.boards[z].board[x][y]
-    }
-
-    setTile(x,y,z,newValue){
-        this.boards[z].board[x][y].val = newValue
-    }
-
-    //Corners
-    //x: 0, y: 0, z: z
-    //x: 3, y: 0, z: z
-    //x: 0, y: 3, z: z
-    //x: 3, y: 3, z: z
-
-    //Down, Left, and Right
-    //x: x, y: 0, z: z
-    //x: 0, y: y, z: z
-    //x: x, y: y, z: 0
-    checkWin(playerValue, x, y, z, xScale, yScale, zScale){
-
-        let count = 0;
-        while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
-            const tile = this.getTile(x, y, z);
-            if(tile.val === playerValue){
-                count++;
-            }
-
-            x += 1 * xScale;
-            y += 1 * yScale;
-            z += 1 * zScale;
-        }
-        return count === 4;
-
-    }
-}
-
-function restoreWinCheck(obj){
-    return {
-        ...obj,
-        winCheck(playerValue, x, y, z, xScale, yScale, zScale){
-            let count = 0;
-            while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
-                const tile = this.getTile(x, y, z);
-                if(tile.val === playerValue){
-                    count++;
+    if (Array.isArray(data)) {
+        // Deep-normalize array elements (they may be JSON strings or nested arrays/objects)
+        return data.map((item) => {
+            if (item == null) return null;
+            if (typeof item === 'string') {
+                try {
+                    return normalizeToArray(JSON.parse(item));
+                } catch (e) {
+                    return item;
                 }
-
-                x += 1 * xScale;
-                y += 1 * yScale;
-                z += 1 * zScale;
             }
-            return count === 4;
-        }
+            return normalizeToArray(item);
+        });
     }
+
+    if (data.BoardState) return normalizeToArray(data.BoardState);
+
+    // If object has numeric keys at top level, map them to an array (one level deep)
+    const topKeys = Object.keys(data).filter(k => /^\d+$/.test(k)).sort((a,b) => Number(a)-Number(b));
+    if (topKeys.length) {
+        return topKeys.map(k => {
+            const v = data[k];
+            // If value is a JSON string or an object/array, normalize it
+            return normalizeToArray(v);
+        });
+    }
+
+    return null;
 }
 
-function restoreGetTile(obj){
-    return{
-        ...obj,
-        getTile(x,y,z){
-            return this.boards[z].board[x][y]
-        }
-    }
-}
-
-function restoreSetTile(obj){
-    return{
-        ...obj,
-        setTile(x,y,z,newValue){
-            this.boards[z].board[x][y].val = newValue
-        }
-    }
-}
-
-export function restoreBoardFunctionality(obj){
-    return{
-        ...obj,
-        checkWin(playerValue, x, y, z, xScale, yScale, zScale){
-            let count = 0;
-            while(x < 4 && y < 4 && z < 4 && x >= 0 && y >= 0 && z >= 0){
-                const tile = this.getTile(x, y, z);
-                if(tile.val === playerValue){
-                    count++;
-                }
-
-                x += 1 * xScale;
-                y += 1 * yScale;
-                z += 1 * zScale;
-            }
-            return count === 4;
-        },
-        getTile(x,y,z){
-            return this.boards[z].board[x][y]
-        },
-        setTile(x,y,z,newValue){
-            this.boards[z].board[x][y].val = newValue
-        }
-    }
-}
-
-export default GameBoardUtils
+export { normalizeToArray };
