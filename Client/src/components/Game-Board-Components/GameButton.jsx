@@ -7,7 +7,7 @@ import { functions } from "../../Utils/GameUtils";
 export default function GameButton({ x, y, z, value }){
     const gameID = useParams().gameID;
     const { User, Socket, Refresh, Token } = useContext(UserContext);
-    const [notify] = Refresh;
+    const [notify, setNotify] = Refresh;
     const [token] = Token;
     const [cell, setCell] = useState(value ?? '-');
     const [game, setGame] = useState(null);
@@ -80,6 +80,7 @@ export default function GameButton({ x, y, z, value }){
         (async () => {
             try {
                 const res = await activeFuncs.makeMove(gameID, token, { x, y, z }, User.name, updatedBoard, Socket);
+                console.log("Move response: ", res);
                 if (!res) console.warn('No ack from makeMove');
             } catch (err) {
                 console.error('makeMove failed:', err);
@@ -89,6 +90,7 @@ export default function GameButton({ x, y, z, value }){
         // Update local cell state optimistically and update local game object
         setCell(symbol);
         setGame(prev => prev ? { ...prev, BoardState: updatedBoard } : prev);
+        setNotify(prev => !prev); // trigger board refresh for all components
     }
 
     const computedClasses = `${baseClasses} ${cell === 'X' ? xClasses : cell === 'O' ? oClasses : emptyClasses}`;

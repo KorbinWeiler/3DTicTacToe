@@ -18,42 +18,9 @@ export default function GameBoard({ gameID }){
 
     useEffect(() => {
         if (!Socket || !gameID) return; //local games dont work without online connection for now
-        // Socket.emit("get board", gameID, (response) => {
-        //     if (response?.error) {
-        //         console.error("Error fetching game board: ", response.error);
-        //         return;
-        //     }         
 
-        //     const boardArray = normalizeToArray(response) ?? normalizeToArray(response?.BoardState) ?? null;
-        //     if (!boardArray) console.error('Unable to normalize board response:', response);
-        //     setBoard(boardArray);
-        //     try { sessionStorage.setItem(`board-${gameID}`, JSON.stringify({ BoardState: boardArray })); } catch (e) {}
-        //     Socket.emit("get winner", gameID, (winResponse) => {
-        //         if (winResponse?.error) {
-        //             console.error("Error fetching game winner: ", winResponse.error);
-        //             return;
-        //         }
-        //         setWinner(winResponse.Winner || null);
-        //     });
-        // });
         const activeFuncs = (gameID && gameID.startsWith("localgame-")) ? localFunctions : functions;
-
-
-        // const boardData = funcs.getBoard(gameID, Socket);
-        // console.log("board data:", boardData);
-        // if (boardData){
-        //     setBoard(boardData);
-        // }
-        // else{
-        //     console.error("Error fetching game board");
-        // }
-        // const winnerData = funcs.getWinner(gameID, Socket);
-        // if (winnerData){
-        //     setWinner(winnerData);
-        // }
-        // else{
-        //     console.error("Error fetching game winner");
-        // }
+        console.log("Using functions: ", activeFuncs);
     let mounted = true;
     (async () => {
         try {

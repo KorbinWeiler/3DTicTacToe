@@ -5,12 +5,12 @@ import {useState, createContext, useEffect} from 'react'
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
 import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
 import HomePage from './pages/HomePage';
-import RegistrationPage from './pages/RegistrationPage.jsx';
-import ProfilePage from './Pages/ProfilePage';
+import RegistrationPage from './pages/RegistrationPage';
+import ProfilePage from './pages/ProfilePage';
 import InvitePage from './pages/InvitePage';
-import FriendsPage from './Pages/FriendsPage';
-import GamesPage from './Pages/GamesPage';
-import PlayGamePage from './Pages/PlayGamePage';
+import FriendsPage from './pages/FriendsPage';
+import GamesPage from './pages/GamesPage.jsx';
+import PlayGamePage from './pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
 import { useRef } from 'react';

@@ -2,10 +2,18 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import OngoingGamesComponent from "../Components/OngoingGamesComponent";
 import GameHistoryComponent from "../components/GameHistoryComponent";
+import { CreateLocalGame } from "../Utils/LocalGameUtils";
 
 export default function GamesPage() {
 
     const [ShowOngoingGames, setShowOngoingGames] = useState(true);
+    const [localRefresh, setLocalRefresh] = useState(false);
+    const User = JSON.parse(sessionStorage.getItem('user'));
+
+    function handleCreateLocalGame() {
+        CreateLocalGame(User);
+        setLocalRefresh(prev => !prev); // trigger refresh of local games list
+    }
 
     useEffect(() => {
         // This would be replaced with an actual API call to fetch games
@@ -40,10 +48,13 @@ export default function GamesPage() {
 
                     <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-4 min-h-75">
                         {ShowOngoingGames ? (
-                            <OngoingGamesComponent />
+                            <OngoingGamesComponent localRefresh={localRefresh} />
                         ) : (
                             <GameHistoryComponent />
                         )}
+                    </div>
+                    <div className="flex justify-center my-3">
+                        <button onClick={() => handleCreateLocalGame()} className="bg-emerald-600 text-white rounded-md p-2 hover:bg-emerald-700 cursor-pointer">Create Local Game</button>
                     </div>
                 </div>
             </main>
