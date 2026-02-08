@@ -6,19 +6,17 @@ const jwt = require('jsonwebtoken');
 const { json } = require('stream/consumers');
 const { callbackify } = require('util');
 const { InitializeBlankBoard, CheckWin } = require('./utils/GameUtils');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 require("dotenv").config()
-
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-const db = new sqlite3.Database('./database/data.db', (err) => {
-  if (err) {
-    console.error('Could not connect to database', err);
-  } else {
-    console.log('Connected to database');
-  }});
+
+// Postgres connection pool - configure via DATABASE_URL or individual PG_* env vars
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+pool.on('error', (err) => console.error('Unexpected PG error', err));
+console.log('Postgres pool created');
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -48,18 +46,20 @@ app.get('/test', (req, res) => {
   res.send('Server is running');
 });
 
-app.post('/login', (req, res) => {
-  db.get(`SELECT PasswordHash FROM Users WHERE Username = '${req.body.username}';`, (err, row) => {
-    if (err) {
-      console.log(err)
-      return res.status(500).json({ error: 'Database error' });
-    }
-    if (!row || row.PasswordHash !== req.body.password) {
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const { rows } = await pool.query('SELECT PasswordHash FROM Users WHERE Username = $1', [username]);
+    const row = rows[0];
+    if (!row || row.passwordhash !== password) {
       return res.status(401).json({ error: 'Invalid credentials' });
-    }1
-    const token = jwt.sign({ username: req.body.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ token: token, user: req.body.username });
-  });
+    }
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ token, user: username });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
 app.get('/guestLogin', (req, res) => {
@@ -71,17 +71,16 @@ app.get('/guestLogin', (req, res) => {
   res.status(200).json({ token: token, user: guestUsername });
 }); 
 
-app.post('/register', (req, res) => {
-  const { username, password, email } = req.body;
-  db.run(`DELETE FROM Users WHERE Username = 'test3';`);
-  console.log("Registering user: ", username, email);
-  db.run(`INSERT INTO Users (Username, PasswordHash, Email) VALUES ('${username}', '${password}', '${email}')`, function(err) {
-    if (err) {
-      console.log(err)
-      return res.status(500).json({ error: 'Database error' });
-    }
+app.post('/register', async (req, res) => {
+  try {
+    const { username, password, email } = req.body;
+    console.log("Registering user: ", username, email);
+    await pool.query('INSERT INTO Users (Username, PasswordHash, Email) VALUES ($1, $2, $3)', [username, password, email]);
     res.status(201).json({ message: 'User registered successfully' });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
 app.listen(process.env.SERVER_PORT, () => console.log('Server running'));
@@ -133,64 +132,69 @@ io.on('connection', (socket) => {
   })
 
   socket.on('get games', (username, callback) =>{
-    db.all(`SELECT GameID, PlayerX, PlayerO, BoardState, CurrentTurn FROM Games WHERE PlayerX = '${username}' OR PlayerO = '${username}' and Winner IS NULL;`, (err, rows) => {
-      if (err) {
-        console.log(err)
+    (async () => {
+      try {
+        const res = await pool.query(`SELECT GameID, PlayerX, PlayerO, BoardState, CurrentTurn FROM Games WHERE (PlayerX = $1 OR PlayerO = $1) AND Winner IS NULL`, [username]);
+        callback(res.rows);
+      } catch (err) {
+        console.error(err);
         callback({ error: 'Database error' });
-        return;
       }
-  
-      callback(rows);
-    }
-    );
+    })();
   })
 
   socket.on('get game', (gameID, callback) =>{
-    db.get(`SELECT * FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
-      if (err) {
-        console.log(err)
+    (async () => {
+      try {
+        const res = await pool.query('SELECT * FROM Games WHERE GameID = $1', [gameID]);
+        const row = res.rows[0] || null;
+        console.log("game data: ", row)
+        callback(row);
+      } catch (err) {
+        console.error(err);
         callback({ error: 'Database error' });
-        return;
       }
-      console.log("game data: ", row)
-      callback(row);
-    });
+    })();
   });
 
   socket.on('get board', (gameID, callback) =>{
     console.log("Fetching board for gameID: " + gameID)
-    db.get(`SELECT BoardState FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
-      if (err) {
-        console.log(err)
+    (async () => {
+      try {
+        const res = await pool.query('SELECT BoardState FROM Games WHERE GameID = $1', [gameID]);
+        const row = res.rows[0] || null;
+        console.log("Ongoing games: ", row)
+        callback(row);
+      } catch (err) {
+        console.error(err);
         callback({ error: 'Database error' });
-        return;
       }
-      console.log("Ongoing games: ", row)
-      callback(row);
-    });
+    })();
   });
 
 
   socket.on('invite', (opponentID, senderID) => {
     const now = new Date().toISOString();
-    db.run(`INSERT INTO Invites (FromUser, ToUser, DateSent, Status) VALUES ('${senderID}', '${opponentID}', '${now}', 'pending');`, function(err) {
-      if (err) {
-        console.log(err)
-        return;
+    (async () => {
+      try {
+        await pool.query('INSERT INTO Invites (FromUser, ToUser, DateSent, Status) VALUES ($1, $2, $3, $4)', [senderID, opponentID, now, 'pending']);
+      } catch (err) {
+        console.error(err);
       }
-    });
+    })();
     io.to(userConnections[opponentID]).emit("update", "invite received");
   })
 
   socket.on('get invites', (username, callback) =>{
-    db.all(`SELECT FromUser, DateSent FROM Invites WHERE ToUser = '${username}' and Status = 'pending';`, (err, rows) => {
-      if (err) {
-        console.log(err)
+    (async () => {
+      try {
+        const res = await pool.query('SELECT FromUser, DateSent FROM Invites WHERE ToUser = $1 AND Status = $2', [username, 'pending']);
+        callback(res.rows);
+      } catch (err) {
+        console.error(err);
         callback({ error: 'Database error' });
-        return;
       }
-      callback(rows);
-    });
+    })();
   })
 
   socket.on("request users", ()=>{
@@ -200,19 +204,14 @@ io.on('connection', (socket) => {
 
   socket.on('accept invitation', (opponentID, hostID, date) =>{
     const blankBoard = InitializeBlankBoard();
-    db.run(`UPDATE Invites SET Status = 'accepted' WHERE FromUser = '${hostID}' AND ToUser = '${opponentID}' and DateSent = '${date}';`, function(err) {
-      if (err) {
-        console.log(err)
-        return;
+    (async () => {
+      try {
+        await pool.query('UPDATE Invites SET Status = $1 WHERE FromUser = $2 AND ToUser = $3 AND DateSent = $4', ['accepted', hostID, opponentID, date]);
+        await pool.query('INSERT INTO Games (PlayerX, PlayerO, BoardState, CurrentTurn) VALUES ($1, $2, $3, $4)', [opponentID, hostID, JSON.stringify(blankBoard), opponentID]);
+      } catch (err) {
+        console.error(err);
       }
-    });
-
-    db.run(`INSERT INTO Games (PlayerX , PlayerO, BoardState, CurrentTurn) VALUES ('${opponentID}', '${hostID}', '${JSON.stringify(blankBoard)}', '${opponentID}');`, function(err) {
-      if (err) {
-        console.log(err)
-        return;
-      }
-    });
+    })();
     io.to(userConnections[hostID]).emit("update", "Game Added")
     io.to(userConnections[opponentID]).emit("update", "Game Added")
   
@@ -228,62 +227,57 @@ io.on('connection', (socket) => {
       }
     });
 
-    db.get(`SELECT PlayerX, PlayerO, CurrentTurn FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
-      if (err) {
-        console.log(err)
-        if (typeof ack === 'function') ack({ error: 'Database error' });
-        return;
-      }
-
-      const nextTurn = row.PlayerX === player ? row.PlayerO : row.PlayerX;
-      const opponentID = row.PlayerX === player ? row.PlayerO : row.PlayerX;
-
-      // Accept either a parsed board (array) or a JSON string. Use parameterized queries
-      // to avoid double-stringifying and SQL injection.
-      const boardString = (typeof updatedBoardState === 'string') ? updatedBoardState : JSON.stringify(updatedBoardState);
-      db.run(`UPDATE Games SET BoardState = ?, CurrentTurn = ? WHERE GameID = ?;`, [boardString, nextTurn, gameID], function(err) {
-        if (err) {
-          console.log(err)
-          if (typeof ack === 'function') ack({ error: 'Database error' });
+    (async () => {
+      try {
+        const res = await pool.query('SELECT PlayerX, PlayerO, CurrentTurn FROM Games WHERE GameID = $1', [gameID]);
+        const row = res.rows[0];
+        if (!row) {
+          if (typeof ack === 'function') ack({ error: 'Game not found' });
           return;
         }
-      });
 
-      // Parse board for win checking if needed
-      let boardForCheck = updatedBoardState;
-      try {
-        if (typeof updatedBoardState === 'string') boardForCheck = JSON.parse(updatedBoardState);
-      } catch (e) {
-        console.log('Failed to parse updatedBoardState for win check:', e);
-        boardForCheck = updatedBoardState;
+        const nextTurn = row.playerx === player ? row.playero : row.playerx;
+        const opponentID = row.playerx === player ? row.playero : row.playerx;
+
+        const boardString = (typeof updatedBoardState === 'string') ? updatedBoardState : JSON.stringify(updatedBoardState);
+        await pool.query('UPDATE Games SET BoardState = $1, CurrentTurn = $2 WHERE GameID = $3', [boardString, nextTurn, gameID]);
+
+        let boardForCheck = updatedBoardState;
+        try {
+          if (typeof updatedBoardState === 'string') boardForCheck = JSON.parse(updatedBoardState);
+        } catch (e) {
+          console.log('Failed to parse updatedBoardState for win check:', e);
+          boardForCheck = updatedBoardState;
+        }
+
+        const playerSymbol = row.playerx === player ? 'X' : 'O';
+        if (CheckWin(move.x, move.y, move.z, boardForCheck, playerSymbol)){
+          await pool.query('UPDATE Games SET Winner = $1 WHERE GameID = $2', [player, gameID]);
+        }
+
+        if (userConnections[player]) io.to(userConnections[player]).emit("update", "move made");
+        if (userConnections[opponentID]) io.to(userConnections[opponentID]).emit("update", "move made");
+
+        if (typeof ack === 'function') ack({ ok: true });
+      } catch (err) {
+        console.error(err);
+        if (typeof ack === 'function') ack({ error: 'Database error' });
       }
-
-      const playerSymbol = row.PlayerX === player ? 'X' : 'O';
-      if (CheckWin(move.x, move.y, move.z, boardForCheck, playerSymbol)){
-        db.run(`UPDATE Games SET Winner = ? WHERE GameID = ?;`, [player, gameID], function(err) {
-          if (err) {
-            console.log(err)
-          }
-        });
-      }
-
-      if (userConnections[player]) io.to(userConnections[player]).emit("update", "move made");
-      if (userConnections[opponentID]) io.to(userConnections[opponentID]).emit("update", "move made");
-
-      if (typeof ack === 'function') ack({ ok: true });
-    });
+    })();
   });
 
   socket.on("get winner", (gameID, callback) =>{
-    db.get(`SELECT Winner FROM Games WHERE GameID = '${gameID}';`, (err, row) => {
-      if (err) {
-        console.log(err)
+    (async () => {
+      try {
+        const res = await pool.query('SELECT Winner FROM Games WHERE GameID = $1', [gameID]);
+        const row = res.rows[0] || null;
+        console.log("Winner data: ", row)
+        callback(row);
+      } catch (err) {
+        console.error(err);
         callback({ error: 'Database error' });
-        return;
       }
-      console.log("Winner data: ", row)
-      callback(row);
-    });
+    })();
   });
 
   socket.on("decline invitation", ({recieverID, invite})=>{
@@ -293,14 +287,15 @@ io.on('connection', (socket) => {
 
   socket.on("get game history", (username, callback) =>{
     console.log("Fetching game history for: " + username)
-    db.all(`SELECT GameID, PlayerX, PlayerO, Winner FROM Games WHERE (PlayerX = '${username}' OR PlayerO = '${username}') AND Winner IS NOT NULL;`, (err, rows) => {
-      if (err) {
-        console.log(err)
+    (async () => {
+      try {
+        const res = await pool.query('SELECT GameID, PlayerX, PlayerO, Winner FROM Games WHERE (PlayerX = $1 OR PlayerO = $1) AND Winner IS NOT NULL', [username]);
+        callback(res.rows);
+      } catch (err) {
+        console.error(err);
         callback({ error: 'Database error' });
-        return;
       }
-      callback(rows);
-    });
+    })();
   });
 
   socket.on('disconnect', () => {
