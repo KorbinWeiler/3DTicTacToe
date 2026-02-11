@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import OngoingGamesComponent from "../Components/OngoingGamesComponent";
+import OngoingGamesComponent from "../components/OngoingGamesComponent";
 import GameHistoryComponent from "../components/GameHistoryComponent";
 import { CreateLocalGame } from "../Utils/LocalGameUtils";
 

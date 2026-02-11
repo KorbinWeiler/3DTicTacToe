@@ -14,6 +14,51 @@ services:
       - ./Server/database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
     ports:
       - "${PG_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U ${POSTGRES_USER:-tictactoe} -d ${POSTGRES_DB:-tictactoe} -h db -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  server:
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    image: tictactoe/server:latest
+    container_name: tictactoe_server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - PGHOST=db
+      - PGPORT=5432
+      - PGUSER=${POSTGRES_USER:-tictactoe}
+      - PGPASSWORD=${POSTGRES_PASSWORD:-password}
+      - PGDATABASE=${POSTGRES_DB:-tictactoe}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-tictactoe}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-tictactoe}
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
+      - SERVER_PORT=3000
+      - SOCKET_PORT=3001
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+
+  client:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    image: tictactoe/client:latest
+    container_name: tictactoe_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    ports:
+      - "5173:80"
 
 volumes:
   db-data:

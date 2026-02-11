@@ -2,7 +2,11 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
-const env = require('dotenv').config();
+// Only load .env in local dev; Docker containers get env vars from docker-compose
+if (!process.env.PGHOST && !process.env.DB_HOST) {
+  require('dotenv').config();
+}
+const env = process.env;
 
 const app = express();
 app.use(express.json());

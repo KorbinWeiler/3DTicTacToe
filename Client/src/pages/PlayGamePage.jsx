@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import GameBoard from "../Components/Game-Board-Components/GameBoard";
+import GameBoard from "../components/Game-Board-Components/GameBoard";
 import Navbar from "../components/Navbar";
 
 export default function PlayGamePage() {

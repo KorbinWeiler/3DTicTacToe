@@ -1,7 +1,7 @@
 import {useState, useContext, useEffect} from 'react';
 import Navbar from "../components/Navbar";
 import InviteComponent from '../components/InviteComponent';
-import Modal from '../Components/Modal';
+import Modal from '../components/Modal';
 import { UserContext } from "../Utils/UserContext";
 import { AccecptInvitation } from '../Utils/SocketMethods';
 

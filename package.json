@@ -1,0 +1,10 @@
+{
+  "name": "3d-tictactoe-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "up": "node ./scripts/manage.js up",
+    "down": "node ./scripts/manage.js down",
+    "up:detached": "node ./scripts/manage.js up detached"
+  }
+}

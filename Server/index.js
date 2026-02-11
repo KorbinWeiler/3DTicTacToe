@@ -7,7 +7,10 @@ const { json } = require('stream/consumers');
 const { callbackify } = require('util');
 const { InitializeBlankBoard, CheckWin } = require('./utils/GameUtils');
 const { Pool } = require('pg');
-require("dotenv").config()
+// Only load .env in local dev; Docker containers get env vars from docker-compose
+if (!process.env.PGHOST && !process.env.DB_HOST) {
+  require('dotenv').config();
+}
 
 const app = express();
 app.use(express.json());

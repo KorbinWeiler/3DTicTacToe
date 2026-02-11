@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+// Only load .env in local dev; Docker containers get env vars from docker-compose
+if (!process.env.PGHOST && !process.env.DB_HOST) {
+  require('dotenv').config();
+}
 const { Pool } = require('pg');
 
 async function run() {
@@ -13,8 +16,8 @@ async function run() {
     } else {
       const user = process.env.PGUSER || process.env.POSTGRES_USER;
       const password = process.env.PGPASSWORD || process.env.POSTGRES_PASSWORD;
-      const host = process.env.PGHOST || process.env.POSTGRES_HOST || 'localhost';
-      const port = process.env.PGPORT || process.env.POSTGRES_PORT || 5432;
+      const host = process.env.PGHOST || process.env.POSTGRES_HOST || process.env.DB_HOST || 'localhost';
+      const port = process.env.PGPORT || process.env.POSTGRES_PORT || process.env.DB_PORT || 5432;
       const database = process.env.PGDATABASE || process.env.POSTGRES_DB;
 
       if (!user || !password || !database) {
@@ -30,6 +33,7 @@ async function run() {
         port: Number(port),
         database,
       };
+      console.log('Connecting to Postgres with', { host: cfg.host, port: cfg.port, user: cfg.user, database: cfg.database });
       pool = new Pool(cfg);
     }
 
