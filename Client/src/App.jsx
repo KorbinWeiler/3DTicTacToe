@@ -15,7 +15,8 @@ import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
 import { useRef } from 'react';
 
-const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
+// Use VITE_SOCKET_URL from docker-compose, or build from IP:PORT for local dev
+const SocketIP = import.meta.env.VITE_SOCKET_URL || `http://${import.meta.env.VITE_SERVER_IP}:${import.meta.env.VITE_SOCKET_PORT}`;
 
 function App() {
   const [notifty, setNotify] = useState(false);

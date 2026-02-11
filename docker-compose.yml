@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-tictactoe}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB:-tictactoe}
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -36,10 +36,10 @@ services:
       - PGHOST=db
       - PGPORT=5432
       - PGUSER=${POSTGRES_USER:-tictactoe}
-      - PGPASSWORD=${POSTGRES_PASSWORD:-password}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
       - PGDATABASE=${POSTGRES_DB:-tictactoe}
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-tictactoe}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-tictactoe}
-      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-tictactoe}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-tictactoe}
+      - JWT_SECRET=${JWT_SECRET}
       - SERVER_PORT=3000
       - SOCKET_PORT=3001
     ports:
@@ -50,13 +50,17 @@ services:
     build:
       context: ./Client
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
+        - VITE_SOCKET_URL=${VITE_SOCKET_URL:-http://localhost:3001}
+        - VITE_SERVER_IP=${VITE_SERVER_IP:-localhost}
+        - VITE_SERVER_PORT=${VITE_SERVER_PORT:-3000}
+        - VITE_SOCKET_PORT=${VITE_SOCKET_PORT:-3001}
     image: tictactoe/client:latest
     container_name: tictactoe_client
     restart: unless-stopped
     depends_on:
       - server
-    environment:
-      - VITE_API_URL=http://localhost:3000
     ports:
       - "5173:80"
 
