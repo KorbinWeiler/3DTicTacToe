@@ -5,7 +5,10 @@ import { test, describe, expect } from 'vitest';
 
 function loadNormalize() {
   const filePath = path.resolve(__dirname, '..', '..', 'Client', 'src', 'Utils', 'GameBoardUtils.js');
-  const code = fs.readFileSync(filePath, 'utf8') + '\nmodule.exports = { normalizeToArray };';
+  // The client file is an ES module; strip its `export` statement(s) so the
+  // source can run as a classic script inside vm, then re-export via CommonJS.
+  const source = fs.readFileSync(filePath, 'utf8').replace(/^\s*export\b.*$/gm, '');
+  const code = source + '\nmodule.exports = { normalizeToArray };';
   const sandbox = { module: {}, exports: {}, require, console };
   vm.runInNewContext(code, sandbox);
   return sandbox.module.exports.normalizeToArray;
@@ -33,7 +36,7 @@ describe('normalizeToArray', () => {
     const normalized = normalizeToArray(obj);
     expect(Array.isArray(normalized)).toBe(true);
     expect(normalized[0][0][0]).toBe('-');
-    expect(normalized[0][0][1]).toBe('X');
+    expect(normalized[0][1]).toBe('X');
     expect(normalized[1][0]).toBe('O');
   });
 });
