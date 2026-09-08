@@ -14,7 +14,11 @@ import PlayGamePage from './pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
 
-const SocketIP = import.meta.env.VITE_SOCKET_URL;
+const rawSocketUrl = import.meta.env.VITE_SOCKET_URL || '';
+// Tolerate a value set without a scheme or with a trailing slash.
+const SocketIP = rawSocketUrl
+  ? rawSocketUrl.replace(/\/+$/, '').replace(/^(?!https?:\/\/)/i, 'https://')
+  : '';
 
 function App() {
   const [notifty, setNotify] = useState(false);

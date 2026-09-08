@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const url = import.meta.env.VITE_API_URL;
+// Tolerate a value set without a scheme or with a trailing slash.
+const normalizeBase = (v) => {
+  if (!v) return '';
+  return v.replace(/\/+$/, '').replace(/^(?!https?:\/\/)/i, 'https://');
+};
+
+const url = normalizeBase(import.meta.env.VITE_API_URL);
 
 const login = async (Username, Password) => {
     const loginURL = `${url}/login`;
