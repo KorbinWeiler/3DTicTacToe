@@ -7,9 +7,8 @@ const jwt = require('jsonwebtoken');
 const sql = require('mssql');
 const { InitializeBlankBoard, CheckWin } = require('./utils/GameUtils');
 
-// Server-local config (port, JWT secret) first, then shared ../.env for the
-// DB_* vars. dotenv does not override vars that are already set, so real
-// environment variables (e.g. on Azure) win over both files.
+// Local config first, then shared ../.env. dotenv does not override vars that
+// are already set, so real environment variables (e.g. on Azure) win.
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
@@ -17,11 +16,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// --- Azure SQL Database (SQL Server) --------------------------------------
-// Build an mssql config object. We parse the ADO.NET connection string
-// ourselves rather than hand it to mssql: mssql's string parser doesn't
-// understand `Server=tcp:...`, `Initial Catalog`, or `Authentication=Active
-// Directory ...`, which is why a passwordless string ends up dialing localhost.
+// --- Azure SQL Database -------------------------------------------------------
+// Auth is always Microsoft Entra passwordless: the App Service managed identity
+// in the cloud, `az login` credentials locally (via DefaultAzureCredential).
+// Everything else (server, database) is parsed out of the ADO.NET connection
+// string in AZURE_SQL_CONNECTIONSTRING - nothing else needs to be configured.
+// We parse it ourselves because mssql's own string parser doesn't understand
+// `Server=tcp:...`, `Initial Catalog`, or `Authentication=Active Directory ...`.
 function parseConnString(cs) {
   const out = {};
   cs.split(';').forEach((pair) => {
@@ -37,50 +38,33 @@ function parseConnString(cs) {
 
 function buildDbConfig() {
   const cs = process.env.AZURE_SQL_CONNECTIONSTRING || process.env.DATABASE_URL;
-  const p = cs ? parseConnString(cs) : {};
-
-  const serverRaw = p['server'] || p['data source'] || process.env.DB_SERVER || 'localhost';
-  const [host, portFromServer] = serverRaw.replace(/^tcp:/i, '').split(',');
-
-  const encrypt = (p['encrypt'] || process.env.DB_ENCRYPT || 'true').toLowerCase() !== 'false';
-  const trustCert =
-    (p['trustservercertificate'] || process.env.DB_TRUST_CERT || 'false').toLowerCase() === 'true';
-
-  const config = {
-    server: host,
-    port: Number(portFromServer || process.env.DB_PORT || 1433),
-    database: p['initial catalog'] || p['database'] || process.env.DB_NAME,
-    options: { encrypt, trustServerCertificate: trustCert },
-    pool: { max: 10, min: 0, idleTimeoutMillis: 30000 },
-  };
-
-  const csAuth = (p['authentication'] || '').toLowerCase();
-  const user = p['user id'] || p['uid'] || process.env.DB_USER;
-  const password = p['password'] || p['pwd'] || process.env.DB_PASSWORD;
-
-  // Passwordless when the string asks for Entra, DB_AUTH=entra is set, or no
-  // password is available anywhere.
-  const wantsEntra =
-    csAuth.includes('active directory') ||
-    csAuth.includes('aad') ||
-    process.env.DB_AUTH === 'entra' ||
-    !password;
-
-  if (wantsEntra) {
-    // Microsoft Entra passwordless: managed identity on Azure, `az login`
-    // locally. `user`, if present, is the client id of a user-assigned
-    // managed identity.
-    const clientId = user || process.env.AZURE_CLIENT_ID;
-    config.authentication = {
-      type: 'azure-active-directory-default',
-      options: clientId ? { clientId } : {},
-    };
-  } else {
-    config.user = user;
-    config.password = password;
+  if (!cs) {
+    throw new Error('AZURE_SQL_CONNECTIONSTRING is not set');
   }
 
-  return config;
+  const p = parseConnString(cs);
+  const serverRaw = p['server'] || p['data source'] || '';
+  const [host, portFromServer] = serverRaw.replace(/^tcp:/i, '').split(',');
+
+  // A user-assigned managed identity's client id may travel in the string as
+  // `User Id=`; otherwise DefaultAzureCredential resolves the identity itself
+  // (system-assigned MI, or AZURE_CLIENT_ID if you set one).
+  const clientId = p['user id'] || p['uid'] || undefined;
+
+  return {
+    server: host,
+    port: Number(portFromServer || 1433),
+    database: p['initial catalog'] || p['database'],
+    authentication: {
+      type: 'azure-active-directory-default',
+      options: clientId ? { clientId } : {},
+    },
+    options: {
+      encrypt: (p['encrypt'] || 'true').toLowerCase() !== 'false',
+      trustServerCertificate: (p['trustservercertificate'] || 'false').toLowerCase() === 'true',
+    },
+    pool: { max: 10, min: 0, idleTimeoutMillis: 30000 },
+  };
 }
 
 const pool = new sql.ConnectionPool(buildDbConfig());
