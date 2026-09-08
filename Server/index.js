@@ -84,10 +84,8 @@ function buildDbConfig() {
       encrypt: (p['encrypt'] || 'true').toLowerCase() !== 'false',
       trustServerCertificate: (p['trustservercertificate'] || 'false').toLowerCase() === 'true',
     },
-    // Generous timeouts: a serverless Azure SQL DB that has auto-paused can take
-    // 30-60s to resume, and the first managed-identity token fetch adds latency.
-    connectionTimeout: 60000,
-    requestTimeout: 60000,
+    connectionTimeout: 15000,
+    requestTimeout: 20000,
     pool: { max: 10, min: 0, idleTimeoutMillis: 30000 },
   };
 }
@@ -100,23 +98,29 @@ console.log(
 const pool = new sql.ConnectionPool(dbConfig);
 pool.on('error', (err) => console.error('Unexpected mssql pool error', err));
 
-// Connect lazily, with retries, so a resuming serverless DB doesn't kill boot.
+// Connect lazily. Keep the total time well under Azure's ~230s request timeout
+// so a failing request returns a real 500 (with CORS headers) instead of a
+// platform gateway timeout that has none. On failure, clear the memoized
+// promise so the next request retries from scratch.
 let poolConnect;
 function connectDb() {
   if (!poolConnect) {
     poolConnect = (async () => {
-      for (let attempt = 1; ; attempt++) {
+      for (let attempt = 1; attempt <= 3; attempt++) {
         try {
           return await pool.connect();
         } catch (err) {
-          if (attempt >= 6) throw err;
-          console.log(
-            `DB connect attempt ${attempt} failed (${err.code || err.message}); retrying in 5s`
+          console.error(
+            `DB connect attempt ${attempt}/3 failed: ${err.code || ''} ${err.message}`
           );
-          await new Promise((r) => setTimeout(r, 5000));
+          if (attempt === 3) throw err;
+          await new Promise((r) => setTimeout(r, 3000));
         }
       }
-    })();
+    })().catch((err) => {
+      poolConnect = undefined;
+      throw err;
+    });
   }
   return poolConnect;
 }
