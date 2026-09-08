@@ -83,6 +83,10 @@ function buildDbConfig() {
       encrypt: (p['encrypt'] || 'true').toLowerCase() !== 'false',
       trustServerCertificate: (p['trustservercertificate'] || 'false').toLowerCase() === 'true',
     },
+    // Generous timeouts: a serverless Azure SQL DB that has auto-paused can take
+    // 30-60s to resume, and the first managed-identity token fetch adds latency.
+    connectionTimeout: 60000,
+    requestTimeout: 60000,
     pool: { max: 10, min: 0, idleTimeoutMillis: 30000 },
   };
 }
@@ -93,15 +97,35 @@ console.log(
     `auth=${dbConfig.authentication ? dbConfig.authentication.type : 'sql'}`
 );
 const pool = new sql.ConnectionPool(dbConfig);
-const poolConnect = pool.connect();
 pool.on('error', (err) => console.error('Unexpected mssql pool error', err));
+
+// Connect lazily, with retries, so a resuming serverless DB doesn't kill boot.
+let poolConnect;
+function connectDb() {
+  if (!poolConnect) {
+    poolConnect = (async () => {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          return await pool.connect();
+        } catch (err) {
+          if (attempt >= 6) throw err;
+          console.log(
+            `DB connect attempt ${attempt} failed (${err.code || err.message}); retrying in 5s`
+          );
+          await new Promise((r) => setTimeout(r, 5000));
+        }
+      }
+    })();
+  }
+  return poolConnect;
+}
 
 // Thin callback-style wrappers so the handlers below stay close to their
 // original shape. Queries use named params @p1, @p2, ... ; identifiers are
 // bracket-quoted, the SQL Server idiom. SQL Server folds nothing, so the
 // PascalCase column names come back exactly as declared.
 async function runQuery(text, params = []) {
-  await poolConnect;
+  await connectDb();
   const request = pool.request();
   params.forEach((val, i) => request.input(`p${i + 1}`, val));
   return request.query(text);
@@ -120,8 +144,9 @@ function dbRun(text, params, cb) {
 }
 
 async function initDb() {
-  await poolConnect;
-  await pool.request().batch(`
+  await connectDb();
+  try {
+    await pool.request().batch(`
     IF OBJECT_ID(N'dbo.Users', N'U') IS NULL
     CREATE TABLE dbo.Users (
       [Username]     NVARCHAR(100)  NOT NULL PRIMARY KEY,
@@ -147,7 +172,21 @@ async function initDb() {
       [DateSent]  NVARCHAR(50)  NOT NULL,
       [Status]    NVARCHAR(20)  NOT NULL CONSTRAINT DF_Invites_Status DEFAULT 'pending'
     );
-  `);
+    `);
+  } catch (err) {
+    // If the tables already exist the IF guards make this a no-op, so a
+    // permission error here means the identity lacks CREATE TABLE rights.
+    // Grant db_ddladmin, or create the tables once from schema.sql as the
+    // Entra admin and the app only needs db_datareader + db_datawriter.
+    if (/permission|denied/i.test(err.message)) {
+      console.error(
+        'initDb: cannot create tables - grant db_ddladmin to the app identity, ' +
+          'or run schema.sql manually. Continuing in case the tables already exist.'
+      );
+    } else {
+      throw err;
+    }
+  }
 }
 
 const server = http.createServer(app);
