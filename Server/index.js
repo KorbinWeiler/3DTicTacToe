@@ -13,8 +13,9 @@ require('dotenv').config();
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
-app.use(express.json());
+// cors() before the body parser so even a JSON-parse error carries CORS headers.
 app.use(cors());
+app.use(express.json());
 
 // --- Azure SQL Database -------------------------------------------------------
 // Auth is always Microsoft Entra passwordless: the App Service managed identity
@@ -254,6 +255,14 @@ app.post('/register', (req, res) => {
       res.status(201).json({ message: 'User registered successfully' });
     }
   );
+});
+
+// Terminal error handler: keep responses JSON so a 500 still carries the CORS
+// headers cors() set earlier, instead of surfacing in the browser as a CORS error.
+app.use((err, req, res, next) => {
+  console.error('Unhandled request error:', err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 io.on('connection', (socket) => {
