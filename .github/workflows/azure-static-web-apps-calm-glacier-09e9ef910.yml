@@ -28,6 +28,13 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - name: Check build env vars are resolving
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SOCKET_URL: ${{ vars.VITE_SOCKET_URL }}
+        run: |
+          echo "VITE_API_URL length    = ${#VITE_API_URL}"
+          echo "VITE_SOCKET_URL length = ${#VITE_SOCKET_URL}"
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
