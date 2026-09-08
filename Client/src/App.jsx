@@ -1,9 +1,9 @@
 import './App.css';
 import LoginPage from './pages/LoginPage.jsx';
-import {BrowserRouter as Router, Routes, Route, redirect, data} from 'react-router-dom'
-import {useState, createContext, useEffect} from 'react'
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import {useState, useEffect} from 'react'
 import ProtectedRoute from './Components/ProtectedRoute'; //ProtectedRoutes are used to protect routes that require authentication
-import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
+// import RestrictedRoute from './Components/RestrictedRoute'; //RestrictedRoutes are used to restrict access based on certain conditions
 import HomePage from './pages/HomePage';
 import RegistrationPage from './pages/RegistrationPage';
 import ProfilePage from './pages/ProfilePage';
@@ -13,7 +13,6 @@ import GamesPage from './pages/GamesPage.jsx';
 import PlayGamePage from './pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
-import { useRef } from 'react';
 
 const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
 
