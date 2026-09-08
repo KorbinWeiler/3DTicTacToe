@@ -14,7 +14,7 @@ import PlayGamePage from './pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
 
-const SocketIP = import.meta.env.VITE_SERVER_IP + ":" + import.meta.env.VITE_SOCKET_PORT;
+const SocketIP = import.meta.env.VITE_SOCKET_URL;
 
 function App() {
   const [notifty, setNotify] = useState(false);

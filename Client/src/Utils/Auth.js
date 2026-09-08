@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const serverIP = import.meta.env.VITE_SERVER_IP;
-const serverPort = import.meta.env.VITE_SERVER_PORT;
-const url = `http://${serverIP}:${serverPort}`;
+const url = import.meta.env.VITE_API_URL;
 
 const login = async (Username, Password) => {
     const loginURL = `${url}/login`;

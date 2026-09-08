@@ -1,25 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import dotenv from 'dotenv';
 import tailwindcss from '@tailwindcss/vite';
 
-dotenv.config({
-  path: path.resolve(__dirname, "../.env"),
-});
-
 export default defineConfig({
+  // .env lives at the repo root, one level above this Client/ dir.
+  // Vite exposes VITE_-prefixed vars from here as import.meta.env.*
+  envDir: path.resolve(__dirname, '..'),
   plugins: [
     react(),
     tailwindcss()
   ],
-  define: {
-    'process.env': {
-      VITE_SERVER_IP: JSON.stringify(process.env.VITE_SERVER_IP),
-      VITE_SERVER_PORT: JSON.stringify(process.env.VITE_SERVER_PORT),
-      VITE_SOCKET_PORT: JSON.stringify(process.env.VITE_SOCKET_PORT),
-    },
-  },
   resolve: {
     alias: {
       react: path.resolve('./node_modules/react'),
