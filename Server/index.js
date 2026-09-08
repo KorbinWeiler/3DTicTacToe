@@ -18,26 +18,72 @@ app.use(express.json());
 app.use(cors());
 
 // --- Azure SQL Database (SQL Server) --------------------------------------
-// Prefer a full connection string (paste the ADO.NET one from the Azure portal
-// into AZURE_SQL_CONNECTIONSTRING); otherwise fall back to discrete DB_* vars.
-const dbConfig =
-  process.env.AZURE_SQL_CONNECTIONSTRING ||
-  process.env.DATABASE_URL || {
-    server: process.env.DB_SERVER || 'localhost',
-    port: Number(process.env.DB_PORT || 1433),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    options: {
-      // Azure SQL requires encryption; local dev against a self-signed cert
-      // usually needs trustServerCertificate=true.
-      encrypt: process.env.DB_ENCRYPT !== 'false',
-      trustServerCertificate: process.env.DB_TRUST_CERT === 'true',
-    },
+// Build an mssql config object. We parse the ADO.NET connection string
+// ourselves rather than hand it to mssql: mssql's string parser doesn't
+// understand `Server=tcp:...`, `Initial Catalog`, or `Authentication=Active
+// Directory ...`, which is why a passwordless string ends up dialing localhost.
+function parseConnString(cs) {
+  const out = {};
+  cs.split(';').forEach((pair) => {
+    const i = pair.indexOf('=');
+    if (i === -1) return;
+    out[pair.slice(0, i).trim().toLowerCase()] = pair
+      .slice(i + 1)
+      .trim()
+      .replace(/^"(.*)"$/, '$1');
+  });
+  return out;
+}
+
+function buildDbConfig() {
+  const cs = process.env.AZURE_SQL_CONNECTIONSTRING || process.env.DATABASE_URL;
+  const p = cs ? parseConnString(cs) : {};
+
+  const serverRaw = p['server'] || p['data source'] || process.env.DB_SERVER || 'localhost';
+  const [host, portFromServer] = serverRaw.replace(/^tcp:/i, '').split(',');
+
+  const encrypt = (p['encrypt'] || process.env.DB_ENCRYPT || 'true').toLowerCase() !== 'false';
+  const trustCert =
+    (p['trustservercertificate'] || process.env.DB_TRUST_CERT || 'false').toLowerCase() === 'true';
+
+  const config = {
+    server: host,
+    port: Number(portFromServer || process.env.DB_PORT || 1433),
+    database: p['initial catalog'] || p['database'] || process.env.DB_NAME,
+    options: { encrypt, trustServerCertificate: trustCert },
     pool: { max: 10, min: 0, idleTimeoutMillis: 30000 },
   };
 
-const pool = new sql.ConnectionPool(dbConfig);
+  const csAuth = (p['authentication'] || '').toLowerCase();
+  const user = p['user id'] || p['uid'] || process.env.DB_USER;
+  const password = p['password'] || p['pwd'] || process.env.DB_PASSWORD;
+
+  // Passwordless when the string asks for Entra, DB_AUTH=entra is set, or no
+  // password is available anywhere.
+  const wantsEntra =
+    csAuth.includes('active directory') ||
+    csAuth.includes('aad') ||
+    process.env.DB_AUTH === 'entra' ||
+    !password;
+
+  if (wantsEntra) {
+    // Microsoft Entra passwordless: managed identity on Azure, `az login`
+    // locally. `user`, if present, is the client id of a user-assigned
+    // managed identity.
+    const clientId = user || process.env.AZURE_CLIENT_ID;
+    config.authentication = {
+      type: 'azure-active-directory-default',
+      options: clientId ? { clientId } : {},
+    };
+  } else {
+    config.user = user;
+    config.password = password;
+  }
+
+  return config;
+}
+
+const pool = new sql.ConnectionPool(buildDbConfig());
 const poolConnect = pool.connect();
 pool.on('error', (err) => console.error('Unexpected mssql pool error', err));
 
