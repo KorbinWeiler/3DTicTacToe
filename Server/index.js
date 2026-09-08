@@ -36,10 +36,30 @@ function parseConnString(cs) {
   return out;
 }
 
+function getConnString() {
+  // A plain App Service *Application setting* comes through with its own name.
+  // A *Connection string* setting is renamed SQLAZURECONNSTR_<name> /
+  // SQLCONNSTR_<name> / CUSTOMCONNSTR_<name>, so fall back to scanning for those.
+  const direct =
+    process.env.AZURE_SQL_CONNECTIONSTRING ||
+    process.env.DATABASE_URL ||
+    process.env.SQLAZURECONNSTR_AZURE_SQL_CONNECTIONSTRING ||
+    process.env.SQLCONNSTR_AZURE_SQL_CONNECTIONSTRING ||
+    process.env.CUSTOMCONNSTR_AZURE_SQL_CONNECTIONSTRING;
+  if (direct) return direct;
+
+  const prefixed = Object.entries(process.env).find(
+    ([k]) => k.startsWith('SQLAZURECONNSTR_') || k.startsWith('SQLCONNSTR_')
+  );
+  return prefixed && prefixed[1];
+}
+
 function buildDbConfig() {
-  const cs = process.env.AZURE_SQL_CONNECTIONSTRING || process.env.DATABASE_URL;
+  const cs = getConnString();
   if (!cs) {
-    throw new Error('AZURE_SQL_CONNECTIONSTRING is not set');
+    throw new Error(
+      'No SQL connection string found (set AZURE_SQL_CONNECTIONSTRING as an App Service Application setting)'
+    );
   }
 
   const p = parseConnString(cs);
@@ -67,7 +87,12 @@ function buildDbConfig() {
   };
 }
 
-const pool = new sql.ConnectionPool(buildDbConfig());
+const dbConfig = buildDbConfig();
+console.log(
+  `DB target: ${dbConfig.server || '(none)'}:${dbConfig.port}/${dbConfig.database || '(none)'} ` +
+    `auth=${dbConfig.authentication ? dbConfig.authentication.type : 'sql'}`
+);
+const pool = new sql.ConnectionPool(dbConfig);
 const poolConnect = pool.connect();
 pool.on('error', (err) => console.error('Unexpected mssql pool error', err));
 
