@@ -103,7 +103,7 @@ export default function RegistrationPage() {
                 </form>
 
                 <p className="mt-4 text-sm text-slate-600 dark:text-slate-300 text-center">
-                    Already have an account? <a href="/login" className="text-emerald-600 hover:underline">Log in</a>
+                    Already have an account? <a href="/" className="text-emerald-600 hover:underline">Log in</a>
                 </p>
             </div>
         </div>

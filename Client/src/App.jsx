@@ -14,11 +14,12 @@ import PlayGamePage from './pages/PlayGamePage';
 import { UserContext } from './Utils/UserContext';
 import { io } from "socket.io-client";
 
-const rawSocketUrl = import.meta.env.VITE_SOCKET_URL || '';
 // Tolerate a value set without a scheme or with a trailing slash.
-const SocketIP = rawSocketUrl
-  ? rawSocketUrl.replace(/\/+$/, '').replace(/^(?!https?:\/\/)/i, 'https://')
-  : '';
+const normalizeOrigin = (v) =>
+  v ? v.replace(/\/+$/, '').replace(/^(?!https?:\/\/)/i, 'https://') : '';
+
+const SocketIP = normalizeOrigin(import.meta.env.VITE_SOCKET_URL);
+const ApiURL = normalizeOrigin(import.meta.env.VITE_API_URL);
 
 function App() {
   const [notifty, setNotify] = useState(false);
@@ -35,7 +36,6 @@ function App() {
       }
       return;
     }
-
 
     if (!socket && token) {
       const s = io(SocketIP, {
@@ -64,6 +64,18 @@ function App() {
       }
     }  
   }, [token]);
+
+  useEffect(() => {
+    // Ping the API once on mount (also wakes a cold/paused server).
+    (async () => {
+      try {
+        const res = await fetch(`${ApiURL}/test`);
+        //console.log("API /test:", res.status, await res.text());
+      } catch (err) {
+        console.log("Waking Up Server", err);
+      }
+    })();
+  }, []);
 
   return (
     <>
