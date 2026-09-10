@@ -13,13 +13,10 @@ const HomePage = () => {
   useEffect(() => {
     // Mock data – replace with API calls
     setMyTurnGames([
-      { ID: '1', Opponent: 'Alice', yourTurn: true },
-      { ID: '2', Opponent: 'Bob', yourTurn: true }
+
     ]);
     setLeaderboard([
-      { name: 'Alice', points: 1500 },
-      { name: 'Bob', points: 1400 },
-      { name: 'Charlie', points: 1300 }
+
     ]);
   }, []);
 
